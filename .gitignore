@@ -16,4 +16,5 @@ scoring/results/
 *.bin
 *.safetensors
 
-.ipynb_checkpoints/analysis/*.csv
+.ipynb_checkpoints/
+analysis/*.csv
