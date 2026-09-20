@@ -6,77 +6,10 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 
-INPUT_PATH = "data/pilot/judge_validation_100.jsonl"
-OUTPUT_PATH = "scoring/results/llm_judge_100.jsonl"
+INPUT_FILE = "data/pilot/pilot_remaining_900.jsonl"
+OUTPUT_FILE = "scoring/results/llm_judge_900.jsonl"
 
 MODEL = "openai/gpt-oss-20b"
-
-
-load_dotenv()
-
-api_key = os.getenv("GROQ_API_KEY")
-
-if not api_key:
-    raise ValueError("GROQ_API_KEY not found in .env")
-
-
-client = OpenAI(
-    api_key=api_key,
-    base_url="https://api.groq.com/openai/v1"
-)
-
-
-def load_jsonl(path):
-    records = []
-
-    if not os.path.exists(path):
-        return records
-
-    with open(path, "r", encoding="utf-8") as file:
-        for line in file:
-            line = line.strip()
-
-            if line:
-                records.append(json.loads(line))
-
-    return records
-
-
-def save_result(record):
-    os.makedirs(
-        os.path.dirname(OUTPUT_PATH),
-        exist_ok=True
-    )
-
-    with open(
-        OUTPUT_PATH,
-        "a",
-        encoding="utf-8"
-    ) as file:
-
-        file.write(
-            json.dumps(
-                record,
-                ensure_ascii=False
-            ) + "\n"
-        )
-
-
-examples = load_jsonl(INPUT_PATH)
-previous_results = load_jsonl(OUTPUT_PATH)
-
-completed_ids = set()
-
-for record in previous_results:
-    completed_ids.add(record["id"])
-
-
-print("Total examples:", len(examples))
-print("Already judged:", len(completed_ids))
-print(
-    "Remaining:",
-    len(examples) - len(completed_ids)
-)
 
 
 SYSTEM_PROMPT = """
@@ -217,121 +150,208 @@ SCORING PROCEDURE
 complexity এবং quality অবশ্যই integer হবে এবং 1 থেকে 5-এর মধ্যে হবে।
 """
 
-def judge_example(example):
-    user_prompt = (
-        "Evaluate the following Bengali instruction-response pair.\n\n"
-        "INSTRUCTION:\n"
-        + example["instruction"]
-        + "\n\n"
-        "RESPONSE:\n"
-        + example["response"]
-    )
 
-    response = client.chat.completions.create(
-        model=MODEL,
-        temperature=0,
-        max_tokens=1500,
-        response_format={
-            "type": "json_schema",
-            "json_schema": {
-                "name": "bengali_instruction_evaluation",
-                "strict": True,
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "complexity": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 5
-                        },
-                        "quality": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 5
-                        },
-                        "reason": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "complexity",
-                        "quality",
-                        "reason"
-                    ],
-                    "additionalProperties": False
-                }
-            }
-        },
-        messages=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT
-            },
-            {
-                "role": "user",
-                "content": user_prompt
-            }
-        ]
-    )
+def load_jsonl(path):
+    rows = []
 
-    content = response.choices[0].message.content
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
 
-    return json.loads(content)
+            if line:
+                rows.append(json.loads(line))
+
+    return rows
 
 
-print("\nLLM Judge Started")
-print("=" * 60)
+load_dotenv()
+
+api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    raise ValueError("GROQ_API_KEY not found in .env")
 
 
-for index, example in enumerate(examples):
+client = OpenAI(
+    api_key=api_key,
+    base_url="https://api.groq.com/openai/v1"
+)
 
-    example_id = example["id"]
 
-    if example_id in completed_ids:
-        continue
+rows = load_jsonl(INPUT_FILE)
 
-    print(
-        f"\nJudging {index + 1}/{len(examples)} "
-        f"(ID: {example_id})"
-    )
 
-    try:
+# Resume support
+judged_pairs = set()
 
-        result = judge_example(example)
+if os.path.exists(OUTPUT_FILE):
+    existing_rows = load_jsonl(OUTPUT_FILE)
 
-        record = {
-            "id": example_id,
-            "instruction": example["instruction"],
-            "response": example["response"],
-            "llm_complexity": result["complexity"],
-            "llm_quality": result["quality"],
-            "llm_reason": result["reason"],
-            "judge_model": MODEL
-        }
-
-        save_result(record)
-
-        completed_ids.add(example_id)
-
-        print(
-            "Complexity:",
-            result["complexity"],
-            "| Quality:",
-            result["quality"]
+    for row in existing_rows:
+        judged_pairs.add(
+            (
+                row["instruction"],
+                row["response"]
+            )
         )
 
-    except Exception as error:
 
-        print("ERROR:", error)
-        print("Waiting 5 seconds before continuing...")
+remaining = []
 
-        time.sleep(10)
+for row in rows:
+    pair = (
+        row["instruction"],
+        row["response"]
+    )
 
-        continue
+    if pair not in judged_pairs:
+        remaining.append(row)
 
 
-print("\n" + "=" * 60)
-print("LLM Judge completed.")
-print("Results:", OUTPUT_PATH)
-print("Total judged:", len(completed_ids))
+print("=" * 60)
+print("BENGALI LLM JUDGE - 900 PILOT")
+print("=" * 60)
+
+print(f"Total examples: {len(rows)}")
+print(f"Already judged: {len(judged_pairs)}")
+print(f"Remaining:      {len(remaining)}")
+print()
+
+
+for index, row in enumerate(remaining, start=1):
+
+    instruction = row["instruction"]
+    response = row["response"]
+
+    user_prompt = f"""
+Instruction:
+{instruction}
+
+Response:
+{response}
+"""
+
+    print(
+        f"Judging {index}/{len(remaining)}"
+    )
+
+    success = False
+
+    for attempt in range(3):
+
+        try:
+
+            completion = client.chat.completions.create(
+                model=MODEL,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": user_prompt
+                    }
+                ],
+                temperature=0,
+                max_tokens=1500,
+                response_format={
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "bengali_judge",
+                        "strict": True,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "complexity": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 5
+                                },
+                                "quality": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 5
+                                },
+                                "reason": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "complexity",
+                                "quality",
+                                "reason"
+                            ],
+                            "additionalProperties": False
+                        }
+                    }
+                }
+            )
+
+            content = completion.choices[0].message.content
+
+            result = json.loads(content)
+
+            output_row = {
+                "instruction": instruction,
+                "response": response,
+                "llm_complexity": result["complexity"],
+                "llm_quality": result["quality"],
+                "reason": result["reason"],
+                "judge_model": MODEL
+            }
+
+            with open(
+                OUTPUT_FILE,
+                "a",
+                encoding="utf-8"
+            ) as f:
+
+                f.write(
+                    json.dumps(
+                        output_row,
+                        ensure_ascii=False
+                    ) + "\n"
+                )
+
+            print(
+                f"Complexity: {result['complexity']} | "
+                f"Quality: {result['quality']}"
+            )
+
+            success = True
+            break
+
+        except Exception as e:
+
+            print(
+                f"Attempt {attempt + 1}/3 failed: {e}"
+            )
+
+            if attempt < 2:
+                print("Waiting 10 seconds before retry...")
+                time.sleep(10)
+
+    if not success:
+
+        print("FAILED after 3 attempts.")
+        print("Stopping so no example is silently skipped.")
+
+        raise RuntimeError(
+            f"Judge failed for example {index}"
+        )
+
+    # Avoid hitting Groq TPM limit
+    time.sleep(10)
+
+
+print()
+print("=" * 60)
+print("LLM JUDGE COMPLETED")
+print("=" * 60)
+
+final_rows = load_jsonl(OUTPUT_FILE)
+
+print(f"Total judged: {len(final_rows)}")
+print(f"Saved: {OUTPUT_FILE}")
 print("=" * 60)
