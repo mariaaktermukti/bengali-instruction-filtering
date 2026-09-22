@@ -12,6 +12,16 @@ OUTPUT_FILE = "scoring/results/llm_judge_900.jsonl"
 MODEL = "openai/gpt-oss-20b"
 
 
+def is_tpd_limit_error(error):
+    error_text = str(error).lower()
+
+    return (
+        "tokens per day" in error_text
+        or "tpd" in error_text
+        or "token per day" in error_text
+    )
+
+
 SYSTEM_PROMPT = """
 তুমি একটি Bengali Instruction-Response Quality এবং Complexity Judge।
 
@@ -231,8 +241,11 @@ Response:
 {response}
 """
 
+    current_number = len(judged_pairs) + index
+
     print(
-        f"Judging {index}/{len(remaining)}"
+        f"Judging {current_number}/900 "
+        f"(remaining: {len(remaining)})"
     )
 
     success = False
@@ -324,6 +337,21 @@ Response:
 
         except Exception as e:
 
+            if is_tpd_limit_error(e):
+
+                print()
+                print("=" * 60)
+                print("GROQ TOKENS-PER-DAY LIMIT REACHED")
+                print("=" * 60)
+                print("Stopping immediately.")
+                print("Already saved results will be preserved.")
+                print("Run this script again after the quota resets.")
+                print("=" * 60)
+
+                raise RuntimeError(
+                    "Groq Tokens-Per-Day limit reached."
+                ) from e
+
             print(
                 f"Attempt {attempt + 1}/3 failed: {e}"
             )
@@ -338,7 +366,7 @@ Response:
         print("Stopping so no example is silently skipped.")
 
         raise RuntimeError(
-            f"Judge failed for example {index}"
+            f"Judge failed for example {current_number}"
         )
 
     # Avoid hitting Groq TPM limit
