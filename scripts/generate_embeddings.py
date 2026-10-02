@@ -5,11 +5,9 @@ from sentence_transformers import SentenceTransformer
 
 MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
-DATA_FILE = "data/pilot/original_tigerllm_pilot_1000.jsonl"
+DATA_FILE = "scoring/results/llm_judge_900.jsonl"
 OUTPUT_EMBEDDINGS = "data/pilot/tigerllm_embeddings_900.npy"
 OUTPUT_METADATA = "data/pilot/tigerllm_metadata_900.jsonl"
-
-LIMIT = 900
 
 
 def load_data():
@@ -20,22 +18,25 @@ def load_data():
 
         for index, line in enumerate(file):
 
-            if index >= LIMIT:
-                break
-
             item = json.loads(line)
 
             instruction = item["instruction"]
             response = item["response"]
 
-            text = "Instruction: " + instruction + "\nResponse: " + response
+            text = (
+                "Instruction: " + instruction +
+                "\nResponse: " + response
+            )
 
             texts.append(text)
 
             metadata.append({
                 "index": index,
                 "instruction": instruction,
-                "response": response
+                "response": response,
+                "llm_complexity": item["llm_complexity"],
+                "llm_quality": item["llm_quality"],
+                "reason": item["reason"]
             })
 
     return texts, metadata
@@ -43,16 +44,17 @@ def load_data():
 
 def main():
 
-    print("Loading model...")
+    print("Loading embedding model...")
 
     model = SentenceTransformer(MODEL_NAME)
 
-    print("Loading pilot data...")
+    print("Loading LLM-judged 900 data...")
 
     texts, metadata = load_data()
 
     print("Examples loaded:", len(texts))
 
+    print()
     print("Creating embeddings...")
 
     embeddings = model.encode(
@@ -64,19 +66,31 @@ def main():
 
     print()
     print("Embedding shape:", embeddings.shape)
+    print("Embedding dimension:", embeddings.shape[1])
 
+    print()
     print("Saving embeddings...")
 
     np.save(OUTPUT_EMBEDDINGS, embeddings)
 
     print("Saved:", OUTPUT_EMBEDDINGS)
 
+    print()
     print("Saving metadata...")
 
-    with open(OUTPUT_METADATA, "w", encoding="utf-8") as file:
+    with open(
+        OUTPUT_METADATA,
+        "w",
+        encoding="utf-8"
+    ) as file:
 
         for item in metadata:
-            file.write(json.dumps(item, ensure_ascii=False) + "\n")
+            file.write(
+                json.dumps(
+                    item,
+                    ensure_ascii=False
+                ) + "\n"
+            )
 
     print("Saved:", OUTPUT_METADATA)
 
