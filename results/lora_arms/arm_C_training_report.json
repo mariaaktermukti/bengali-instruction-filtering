@@ -1,0 +1,135 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "arm": "C",
+  "train_file": "/kaggle/input/notebooks/habiburrahman153/bangla-filtering-selection/bangla_filtering/pilot/arms/arm_C.jsonl",
+  "heldout_file": "/kaggle/input/notebooks/habiburrahman153/bangla-filtering-selection/bangla_filtering/pilot/arms/heldout.jsonl",
+  "token_stats": {
+    "examples_in": 400,
+    "examples_used": 400,
+    "truncated_to_max_length": 3,
+    "dropped_prompt_too_long": 0,
+    "median_tokens": 1163,
+    "max_tokens": 3072
+  },
+  "heldout_token_stats": {
+    "examples_in": 47,
+    "examples_used": 47,
+    "truncated_to_max_length": 0,
+    "dropped_prompt_too_long": 0,
+    "median_tokens": 1111,
+    "max_tokens": 2522
+  },
+  "max_length": 3072,
+  "epochs": 1,
+  "max_steps": -1,
+  "global_steps": 100,
+  "train_loss": 0.9174115943908692,
+  "heldout_loss_before": 0.95787513256073,
+  "heldout_loss_after": 0.9020135998725891,
+  "log_history": [
+    {
+      "loss": 0.9641293525695801,
+      "grad_norm": 0.4475729465484619,
+      "learning_rate": 9.1e-05,
+      "epoch": 0.1,
+      "step": 10
+    },
+    {
+      "loss": 0.9573718070983886,
+      "grad_norm": 0.4572722911834717,
+      "learning_rate": 8.1e-05,
+      "epoch": 0.2,
+      "step": 20
+    },
+    {
+      "loss": 0.9205464363098145,
+      "grad_norm": 0.5234978795051575,
+      "learning_rate": 7.1e-05,
+      "epoch": 0.3,
+      "step": 30
+    },
+    {
+      "loss": 0.8869014739990234,
+      "grad_norm": 0.6972758769989014,
+      "learning_rate": 6.1e-05,
+      "epoch": 0.4,
+      "step": 40
+    },
+    {
+      "loss": 0.9108826637268066,
+      "grad_norm": 0.5705665946006775,
+      "learning_rate": 5.1000000000000006e-05,
+      "epoch": 0.5,
+      "step": 50
+    },
+    {
+      "loss": 0.9177907943725586,
+      "grad_norm": 0.6153056025505066,
+      "learning_rate": 4.1e-05,
+      "epoch": 0.6,
+      "step": 60
+    },
+    {
+      "loss": 0.8390392303466797,
+      "grad_norm": 0.5443417429924011,
+      "learning_rate": 3.1e-05,
+      "epoch": 0.7,
+      "step": 70
+    },
+    {
+      "loss": 0.9602396011352539,
+      "grad_norm": 0.44947725534439087,
+      "learning_rate": 2.1e-05,
+      "epoch": 0.8,
+      "step": 80
+    },
+    {
+      "loss": 0.9224140167236328,
+      "grad_norm": 0.4672469198703766,
+      "learning_rate": 1.1000000000000001e-05,
+      "epoch": 0.9,
+      "step": 90
+    },
+    {
+      "loss": 0.8948005676269531,
+      "grad_norm": 0.5151855945587158,
+      "learning_rate": 1.0000000000000002e-06,
+      "epoch": 1.0,
+      "step": 100
+    },
+    {
+      "train_runtime": 345.3156,
+      "train_samples_per_second": 1.158,
+      "train_steps_per_second": 0.29,
+      "total_flos": 1037046416972544.0,
+      "train_loss": 0.9174115943908692,
+      "epoch": 1.0,
+      "step": 100
+    },
+    {
+      "eval_loss": 0.9020135998725891,
+      "eval_model_preparation_time": 0.0112,
+      "eval_runtime": 14.2895,
+      "eval_samples_per_second": 3.289,
+      "eval_steps_per_second": 3.289,
+      "epoch": 1.0,
+      "step": 100
+    }
+  ],
+  "training_minutes": 5.76,
+  "fp16": true,
+  "gpu": "Tesla T4",
+  "peak_gpu_gib": 7.6,
+  "generations_before": {
+    "বাংলাদেশের জাতীয় ফুলের নাম কী এবং এর বৈশিষ্ট্যগুলো কী কী?": "বাংলাদেশের জাতীয় ফুলের নাম \"সন্ধি\" (Sanskrit: सन्धि) এবং এর বৈশিষ্ট্যগুলো সম্পূর্ণ হতে পারে।\n\n1. নাম:\n   - সন্ধি (सन्धि)\n   - শক্তি (शक्ति)\n\n2. বৈশিষ্ট্যগুলো:\n   - অভিভাবনা (अभिभावना)\n   - আদি (आदिस)\n   - চালিতা (चलिता)\n",
+    "একটি সংখ্যা মৌলিক কিনা তা পরীক্ষা করার জন্য একটি পাইথন ফাংশন লেখো।": "পাইথন ফাংশন \"Convert Integer to Roman Numeral\" ব্যবহার করতে হবে একটি অনুযায়ী পাইথন টাইম ডাউন্ট (TOM) ও আইন ডাউন্ট (IAN) দেওয়া হলে। এটি একটি শিক্ষার ভাষায় গণিত করার জন্য একটি পাইথন ছিল।\n\nএটি একটি সঠিক পাইথন থাকে এবং এটি একটি",
+    "$\\dfrac{x^{2}}{a^{2}}+\\dfrac{y^{2}}{25}=1(a > 5)$ সমীকরণ দ্বারা প্রকাশিত উপবৃত্তের দুটি নাভি $F_{1}$ এবং $F_{2}$ এবং $|F_{1}F_{2}|=8$। যদি জ্যা $AB$ বিন্দু $F_{1}$ দিয়ে যায়, তাহলে $\\triangle ABF_{2}$ এর পরিসীমা $(\\ )$।\nA: $10$\nB: $20$\nC: $2\\sqrt{41}$\nD: $4\\sqrt{41}$": "To solve this problem, we need to determine the length of the side \\(AB\\) in the given hyperbola equation \\(\\frac{x^2}{a^2} + \\frac{y^2}{25} = 1\\) with foci at \\(F_1\\) and \\(F_2\\) such that \\(|F_1F_2| = 8\\).\n\nFirst, recall the standard form of a hyperbola centered at the origin with horizontal transverse axis:\n\\[\n\\frac{x^2}{a^2} - \\frac{y^2}{b^2} = 1\n\\]\nwhere \\(c\\) is the distance from the center to each focus, and it satisfies the relationship \\(c^2 = a^2 + b^2\\). Given that \\(c = 8\\), we have:\n\\[\nc^2 = 64 \\implies a^2 + b^2 = 64",
+    "নিম্নলিখিত শব্দগুলি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করুনঃ নাম = দ্য রাইস বোট, খাবার = ফাস্ট ফুড, মূল্যরেঞ্জ = উচ্চ, গ্রাহক রেটিং = 1 এর মধ্যে 5, এলাকা = নদীর তীরে, পরিবারবন্ধুত্বপূর্ণ = না, কাছাকাছি = এক্সপ্রেস দ্বারা হলিডে ইন": "এই ভাষার অভিযানের আয়োজন করা হয়েছে। এটি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করে। এটি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করে। এটি ব্যব"
+  },
+  "generations_after": {
+    "বাংলাদেশের জাতীয় ফুলের নাম কী এবং এর বৈশিষ্ট্যগুলো কী কী?": "বাংলাদেশের জাতীয় ফুলের নাম \"সন্ধি\"। সন্ধি হল প্রতিশ্রুপ ও অভিভাবক ছিলেন। আমরা ইহার উদ্ভাবনার চেষ্টা করি যে সন্ধি এই গণ্ডের মধ্যে প্রতিশ্রুপ থাকে। সন্ধি এই গণ্ডের মধ্যে প্রতিশ্রুপ থাকে না। সন্ধি �",
+    "একটি সংখ্যা মৌলিক কিনা তা পরীক্ষা করার জন্য একটি পাইথন ফাংশন লেখো।": "```python\ndef is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n\n# Test the function with some prime numbers\nprint(is_prime(7)) # Output: True\nprint(is_prime(10)) # Output: False\n```\n\nIn this code snippet, we define a function `is_prime` that takes an integer `n` as input and returns `True` if it's a prime number, otherwise `False`. We use a simple algorithm to check whether a given number is prime or not. The algorithm works by checking divisibility of `n` from 2 up to its square root. If any divisor is found, then `n` is not a prime number; otherwise, it is a prime number.",
+    "$\\dfrac{x^{2}}{a^{2}}+\\dfrac{y^{2}}{25}=1(a > 5)$ সমীকরণ দ্বারা প্রকাশিত উপবৃত্তের দুটি নাভি $F_{1}$ এবং $F_{2}$ এবং $|F_{1}F_{2}|=8$। যদি জ্যা $AB$ বিন্দু $F_{1}$ দিয়ে যায়, তাহলে $\\triangle ABF_{2}$ এর পরিসীমা $(\\ )$।\nA: $10$\nB: $20$\nC: $2\\sqrt{41}$\nD: $4\\sqrt{41}$": "To solve the problem, we need to determine the length of the side \\(AB\\) in the given hyperbola and then use it to find the distance between the foci.\n\nThe equation of the hyperbola is:\n\\[\n\\dfrac{x^2}{a^2} + \\dfrac{y^2}{25} = 1\n\\]\nwhere \\(a > 5\\). The standard form of a hyperbola that opens horizontally is:\n\\[\n\\dfrac{x^2}{a^2} - \\dfrac{y^2}{b^2} = 1\n\\]\nBy comparing the given equation with the standard form, we can identify that \\(a^2 = 25\\) and \\(b^2 = a^2\\). Therefore, \\(b^2 = 25\\), so \\(b = 5\\).\n\nFor a hyperbola, the relationship between \\(a\\), \\(b\\), and \\(",
+    "নিম্নলিখিত শব্দগুলি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করুনঃ নাম = দ্য রাইস বোট, খাবার = ফাস্ট ফুড, মূল্যরেঞ্জ = উচ্চ, গ্রাহক রেটিং = 1 এর মধ্যে 5, এলাকা = নদীর তীরে, পরিবারবন্ধুত্বপূর্ণ = না, কাছাকাছি = এক্সপ্রেস দ্বারা হলিডে ইন": "এই ভাষার অভিযান আছে। এই ভাষার অভিযান ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করুন।\n\n1. নাম: দ্য রাইস বোট (Dy Rāiṣ Bōṭ)\n2. খাবার: ফাস্ট ফুড (Fāsṭ Fūḍ)\n3. মূল্যরেঞ্জ: উচ্চ (Uchījān"
+  }
+}
