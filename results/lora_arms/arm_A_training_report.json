@@ -1,0 +1,226 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "arm": "A",
+  "train_file": "/kaggle/input/notebooks/habiburrahman153/bangla-filtering-selection/bangla_filtering/pilot/arms/arm_A.jsonl",
+  "heldout_file": "/kaggle/input/notebooks/habiburrahman153/bangla-filtering-selection/bangla_filtering/pilot/arms/heldout.jsonl",
+  "token_stats": {
+    "examples_in": 955,
+    "examples_used": 955,
+    "truncated_to_max_length": 4,
+    "dropped_prompt_too_long": 0,
+    "median_tokens": 1116,
+    "max_tokens": 3072
+  },
+  "heldout_token_stats": {
+    "examples_in": 47,
+    "examples_used": 47,
+    "truncated_to_max_length": 0,
+    "dropped_prompt_too_long": 0,
+    "median_tokens": 1111,
+    "max_tokens": 2522
+  },
+  "max_length": 3072,
+  "epochs": 1,
+  "max_steps": -1,
+  "global_steps": 239,
+  "train_loss": 0.9019207375817718,
+  "heldout_loss_before": 0.95787513256073,
+  "heldout_loss_after": 0.881456196308136,
+  "log_history": [
+    {
+      "loss": 0.9169333457946778,
+      "grad_norm": 0.4287594258785248,
+      "learning_rate": 9.623430962343097e-05,
+      "epoch": 0.041884816753926704,
+      "step": 10
+    },
+    {
+      "loss": 0.9443843841552735,
+      "grad_norm": 0.41550111770629883,
+      "learning_rate": 9.205020920502092e-05,
+      "epoch": 0.08376963350785341,
+      "step": 20
+    },
+    {
+      "loss": 0.891758918762207,
+      "grad_norm": 0.49437519907951355,
+      "learning_rate": 8.786610878661088e-05,
+      "epoch": 0.1256544502617801,
+      "step": 30
+    },
+    {
+      "loss": 0.8793814659118653,
+      "grad_norm": 0.46062177419662476,
+      "learning_rate": 8.368200836820084e-05,
+      "epoch": 0.16753926701570682,
+      "step": 40
+    },
+    {
+      "loss": 0.8432389259338379,
+      "grad_norm": 0.4416806101799011,
+      "learning_rate": 7.949790794979079e-05,
+      "epoch": 0.2094240837696335,
+      "step": 50
+    },
+    {
+      "loss": 0.8985966682434082,
+      "grad_norm": 0.9245482683181763,
+      "learning_rate": 7.531380753138076e-05,
+      "epoch": 0.2513089005235602,
+      "step": 60
+    },
+    {
+      "loss": 0.8987943649291992,
+      "grad_norm": 0.49870774149894714,
+      "learning_rate": 7.11297071129707e-05,
+      "epoch": 0.2931937172774869,
+      "step": 70
+    },
+    {
+      "loss": 0.9666489601135254,
+      "grad_norm": 0.6486659646034241,
+      "learning_rate": 6.694560669456067e-05,
+      "epoch": 0.33507853403141363,
+      "step": 80
+    },
+    {
+      "loss": 0.9095765113830566,
+      "grad_norm": 0.6301126480102539,
+      "learning_rate": 6.276150627615063e-05,
+      "epoch": 0.3769633507853403,
+      "step": 90
+    },
+    {
+      "loss": 0.9463370323181153,
+      "grad_norm": 0.6120513677597046,
+      "learning_rate": 5.857740585774059e-05,
+      "epoch": 0.418848167539267,
+      "step": 100
+    },
+    {
+      "loss": 0.969523811340332,
+      "grad_norm": 0.7322309017181396,
+      "learning_rate": 5.4393305439330545e-05,
+      "epoch": 0.4607329842931937,
+      "step": 110
+    },
+    {
+      "loss": 0.9130568504333496,
+      "grad_norm": 0.6004538536071777,
+      "learning_rate": 5.02092050209205e-05,
+      "epoch": 0.5026178010471204,
+      "step": 120
+    },
+    {
+      "loss": 0.8676694869995117,
+      "grad_norm": 0.5013691186904907,
+      "learning_rate": 4.602510460251046e-05,
+      "epoch": 0.5445026178010471,
+      "step": 130
+    },
+    {
+      "loss": 0.8698610305786133,
+      "grad_norm": 0.5965356230735779,
+      "learning_rate": 4.184100418410042e-05,
+      "epoch": 0.5863874345549738,
+      "step": 140
+    },
+    {
+      "loss": 0.9585067749023437,
+      "grad_norm": 0.7471379637718201,
+      "learning_rate": 3.765690376569038e-05,
+      "epoch": 0.6282722513089005,
+      "step": 150
+    },
+    {
+      "loss": 0.8708158493041992,
+      "grad_norm": 0.6827289462089539,
+      "learning_rate": 3.3472803347280334e-05,
+      "epoch": 0.6701570680628273,
+      "step": 160
+    },
+    {
+      "loss": 0.8899659156799317,
+      "grad_norm": 0.7390626072883606,
+      "learning_rate": 2.9288702928870294e-05,
+      "epoch": 0.7120418848167539,
+      "step": 170
+    },
+    {
+      "loss": 0.9429998397827148,
+      "grad_norm": 0.6209800243377686,
+      "learning_rate": 2.510460251046025e-05,
+      "epoch": 0.7539267015706806,
+      "step": 180
+    },
+    {
+      "loss": 0.8857478141784668,
+      "grad_norm": 0.6434244513511658,
+      "learning_rate": 2.092050209205021e-05,
+      "epoch": 0.7958115183246073,
+      "step": 190
+    },
+    {
+      "loss": 0.9143058776855468,
+      "grad_norm": 0.6316890120506287,
+      "learning_rate": 1.6736401673640167e-05,
+      "epoch": 0.837696335078534,
+      "step": 200
+    },
+    {
+      "loss": 0.8577687263488769,
+      "grad_norm": 0.6352338790893555,
+      "learning_rate": 1.2552301255230125e-05,
+      "epoch": 0.8795811518324608,
+      "step": 210
+    },
+    {
+      "loss": 0.9509059906005859,
+      "grad_norm": 0.5240581631660461,
+      "learning_rate": 8.368200836820084e-06,
+      "epoch": 0.9214659685863874,
+      "step": 220
+    },
+    {
+      "loss": 0.8310580253601074,
+      "grad_norm": 1.2969375848770142,
+      "learning_rate": 4.184100418410042e-06,
+      "epoch": 0.9633507853403142,
+      "step": 230
+    },
+    {
+      "train_runtime": 809.1153,
+      "train_samples_per_second": 1.18,
+      "train_steps_per_second": 0.295,
+      "total_flos": 2287552787866368.0,
+      "train_loss": 0.9019207375817718,
+      "epoch": 1.0,
+      "step": 239
+    },
+    {
+      "eval_loss": 0.881456196308136,
+      "eval_model_preparation_time": 0.013,
+      "eval_runtime": 15.1965,
+      "eval_samples_per_second": 3.093,
+      "eval_steps_per_second": 3.093,
+      "epoch": 1.0,
+      "step": 239
+    }
+  ],
+  "training_minutes": 13.49,
+  "fp16": true,
+  "gpu": "Tesla T4",
+  "peak_gpu_gib": 7.6,
+  "generations_before": {
+    "বাংলাদেশের জাতীয় ফুলের নাম কী এবং এর বৈশিষ্ট্যগুলো কী কী?": "বাংলাদেশের জাতীয় ফুলের নাম \"সন্ধি\" (Sanskrit: सन्धि) এবং এর বৈশিষ্ট্যগুলো সম্পূর্ণ হতে পারে।\n\n1. নাম:\n   - সন্ধি (सन्धि)\n   - শক্তি (शक्ति)\n\n2. বৈশিষ্ট্যগুলো:\n   - অভিভাবনা (अभिभावना)\n   - আদি (आदिस)\n   - চালিতা (चलिता)\n",
+    "একটি সংখ্যা মৌলিক কিনা তা পরীক্ষা করার জন্য একটি পাইথন ফাংশন লেখো।": "পাইথন ফাংশন \"Convert Integer to Roman Numeral\" ব্যবহার করতে হবে একটি অনুযায়ী পাইথন টাইম ডাউন্ট (TOM) ও আইন ডাউন্ট (IAN) দেওয়া হলে। এটি একটি শিক্ষার ভাষায় গণিত করার জন্য একটি পাইথন ছিল।\n\nএটি একটি সঠিক পাইথন থাকে এবং এটি একটি",
+    "$\\dfrac{x^{2}}{a^{2}}+\\dfrac{y^{2}}{25}=1(a > 5)$ সমীকরণ দ্বারা প্রকাশিত উপবৃত্তের দুটি নাভি $F_{1}$ এবং $F_{2}$ এবং $|F_{1}F_{2}|=8$। যদি জ্যা $AB$ বিন্দু $F_{1}$ দিয়ে যায়, তাহলে $\\triangle ABF_{2}$ এর পরিসীমা $(\\ )$।\nA: $10$\nB: $20$\nC: $2\\sqrt{41}$\nD: $4\\sqrt{41}$": "To solve this problem, we need to determine the length of the side \\(AB\\) in the given hyperbola equation \\(\\frac{x^2}{a^2} + \\frac{y^2}{25} = 1\\) with foci at \\(F_1\\) and \\(F_2\\) such that \\(|F_1F_2| = 8\\).\n\nFirst, recall the standard form of a hyperbola centered at the origin with horizontal transverse axis:\n\\[\n\\frac{x^2}{a^2} - \\frac{y^2}{b^2} = 1\n\\]\nwhere \\(c\\) is the distance from the center to each focus, and it satisfies the relationship \\(c^2 = a^2 + b^2\\). Given that \\(c = 8\\), we have:\n\\[\nc^2 = 64 \\implies a^2 + b^2 = 64",
+    "নিম্নলিখিত শব্দগুলি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করুনঃ নাম = দ্য রাইস বোট, খাবার = ফাস্ট ফুড, মূল্যরেঞ্জ = উচ্চ, গ্রাহক রেটিং = 1 এর মধ্যে 5, এলাকা = নদীর তীরে, পরিবারবন্ধুত্বপূর্ণ = না, কাছাকাছি = এক্সপ্রেস দ্বারা হলিডে ইন": "এই ভাষার অভিযানের আয়োজন করা হয়েছে। এটি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করে। এটি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করে। এটি ব্যব"
+  },
+  "generations_after": {
+    "বাংলাদেশের জাতীয় ফুলের নাম কী এবং এর বৈশিষ্ট্যগুলো কী কী?": "বাংলাদেশের জাতীয় ফুলের নাম হল \"সৌন্ধম্ভ\"। এটি সৌন্ধম্ভ প্রতিশ্রুপ ও অভিজ্ঞতা থেকে আমাদের উদ্দেশ্যে গণনা করেছে। এই ফুলের নাম একটি বিশ্লেষণ করে একটি বিশ্লেষণ করে একটি বিশ্লেষণ করে একটি বিশ্লেষণ ক",
+    "একটি সংখ্যা মৌলিক কিনা তা পরীক্ষা করার জন্য একটি পাইথন ফাংশন লেখো।": "```python\ndef is_prime(n):\n    if n <= 1:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n\n# Example usage:\nprint(is_prime(7)) # Output: True\nprint(is_prime(10)) # Output: False\n```\n\n### উদাহরণসমূহ:\n\n- `is_prime(2)` এবং `is_prime(3)` দেওয়া হতে পারে এবং আপনার বিশেষ অভিজ্ঞতা থাকে না।\n- `is_prime(4)` এবং `is_prime(6)` দেওয়া হতে �",
+    "$\\dfrac{x^{2}}{a^{2}}+\\dfrac{y^{2}}{25}=1(a > 5)$ সমীকরণ দ্বারা প্রকাশিত উপবৃত্তের দুটি নাভি $F_{1}$ এবং $F_{2}$ এবং $|F_{1}F_{2}|=8$। যদি জ্যা $AB$ বিন্দু $F_{1}$ দিয়ে যায়, তাহলে $\\triangle ABF_{2}$ এর পরিসীমা $(\\ )$।\nA: $10$\nB: $20$\nC: $2\\sqrt{41}$\nD: $4\\sqrt{41}$": "To solve the problem, we need to determine the coordinates of points \\( A \\) and \\( B \\) in terms of their distances from point \\( F_1 \\), and then use these distances to find the length of the side \\( AB \\).\n\nGiven:\n- The equation of the ellipse is \\(\\dfrac{x^2}{a^2} + \\dfrac{y^2}{25} = 1\\) with \\( a > 5 \\).\n- The distance between the foci \\( F_1 \\) and \\( F_2 \\) is \\( |F_1F_2| = 8 \\).\n\nFirst, let's identify the semi-major axis \\( b \\). Since \\( a > 5 \\), we have \\( a^2 = b^2 + 25 \\). The distance between the foci is given by \\( 2c \\), where \\( c = \\sqrt{a^2 - b^2} \\).",
+    "নিম্নলিখিত শব্দগুলি ব্যবহার করে একটি রেস্তোঁরা সম্পর্কে একটি বর্ণনামূলক বাক্য তৈরি করুনঃ নাম = দ্য রাইস বোট, খাবার = ফাস্ট ফুড, মূল্যরেঞ্জ = উচ্চ, গ্রাহক রেটিং = 1 এর মধ্যে 5, এলাকা = নদীর তীরে, পরিবারবন্ধুত্বপূর্ণ = না, কাছাকাছি = এক্সপ্রেস দ্বারা হলিডে ইন": "এই ভাষার অভিজ্ঞতা আছে:\n\n- দ্য রাইস বোট: রাইস বোট ও রাইস বোটের সাথে ব্যবহার করে।\n- খাবার: খাবার ও খাবারের সাথে ব্যবহার করে।\n- মূল্যরেঞ্জ: মূল্যরেঞ্জ ও মূল্যরেঞ্জের সাথে ব্যবহার করে।\n- গ্রাহক রেট"
+  }
+}

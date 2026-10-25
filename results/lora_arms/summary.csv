@@ -1,0 +1,6 @@
+arm,train_examples,truncated,steps,train_loss,heldout_loss_before,heldout_loss_after,heldout_loss_change,heldout_ppl_before,heldout_ppl_after,training_minutes,peak_gpu_gib
+A,955,4,239,0.9019,0.9579,0.8815,-0.0764,2.606,2.414,13.49,7.6
+B,400,0,100,0.9246,0.9579,0.9014,-0.0565,2.606,2.463,5.43,7.04
+C,400,3,100,0.9174,0.9579,0.902,-0.0559,2.606,2.465,5.76,7.6
+D,400,1,100,0.8685,0.9579,0.9067,-0.0512,2.606,2.476,5.86,7.6
+F,400,3,100,1.0017,0.9579,0.9098,-0.0481,2.606,2.484,6.43,7.6
