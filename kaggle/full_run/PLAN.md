@@ -1,0 +1,55 @@
+# Full-run plan: 100K-row pool on Kaggle
+
+Scale the Iteration 03 pilot (1,000 rows) to the full 100K pool. We have no local GPU, so every stage
+runs as a private Kaggle **script kernel**. Each stage reads the previous stage's output by attaching
+that kernel as an input (`kernel_sources`).
+
+Data: `md-nishat-008/Bangla-Instruct` has **342,391 rows**. As in the pilot notebook, we draw a
+domain-stratified sample of 100,000 pool rows + 500 held-out rows (seed 42). The held-out rows are
+set aside before any filtering and never trained on.
+
+Live status and the next command to run: [HANDOFF.md](../../HANDOFF.md).
+
+## Kaggle limits we plan around
+
+- GPU quota: about 30 h per week. A session runs at most 12 h; we stop scoring at 10.5 h and save partial results.
+- `machine_shape: NvidiaTeslaT4` gives **2 × T4** (16 GB each, no native bf16). Quota counts session
+  time, not GPUs, so every GPU stage keeps both T4s busy.
+- CPU kernels do not use GPU quota.
+- A kernel whose session is killed at 12 h loses its output, so scoring stages checkpoint and stop on a time budget.
+
+## Stages
+
+| # | Kernel | Hardware | Does | Est. time | Status |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `bn-full-s01-clean` | CPU | sample 100K + 500 held-out, normalise, filters, dedup, decontamination, token counts | 11 min | done: 91,120 pool / 470 held-out |
+| 2 | `bn-full-s02-ifd-embed` | 2×T4 | IFD with Llama-3.2-1B (one half of the rows per GPU), bge-m3 embeddings, τ calibration stats | ~3.5 h | done: 223 min |
+| 3a | `bn-full-s03a-judge-bench` | 2×T4 | judge throughput benchmark on the 955 pilot rows: HF backend vs vLLM fp16 TP2, AWQ and GPTQ-Int8 (one copy per GPU), Spearman agreement with the pilot scores | ~1 h | running |
+| 3 | `bn-full-s03-judge-NN` | 2×T4 | LLM judge c, q for all rows; each run resumes from the previous runs' outputs | 15–47 h (depends on 3a) | to write |
+| 4 | `bn-full-s04-select` | CPU | build arms A–F, recalibrate τ, diagnostics | < 1 h | to write |
+| 5 | `bn-full-lora-<arm>` | 2×T4 | LoRA per arm, two arms at once (one per GPU) | ~2.5 h per 10K-row arm | adapt `scripts/kaggle_lora_training.py` |
+| 6 | `bn-full-eval` | T4 | held-out loss per model (500 rows) + bootstrap | ~1–2 h | adapt `scripts/heldout_per_example.py` |
+
+Estimated GPU total: about 60–90 h, i.e. 2–3 weeks of Kaggle quota. The judge is the largest cost.
+
+## The judge (Stage 3) is the bottleneck
+
+Pilot: 3,216 s for 955 rows, but the pilot scored 4 prompts per row (English + Bengali rubric × complexity, quality).
+Full mode uses the English rubric only, so 2 prompts per row: **about 47 GPU-hours** with the HF backend.
+
+On a T4, Qwen2.5-7B-Instruct in fp16 (15 GB) does not fit on one GPU, so the HF backend splits it across both.
+Only one GPU computes at a time. Options that Stage 3a measures:
+
+1. **HF, as in the pilot**: no change in scores, about 47 h.
+2. **vLLM, tensor-parallel over 2 T4s**: same weights, so scores should match. Expect 2–4× faster if vLLM runs on T4 (compute capability 7.5) with the Kaggle image.
+3. **AWQ 4-bit 7B, one copy per GPU** (`Qwen/Qwen2.5-7B-Instruct-AWQ`): fastest, but the scores change slightly. Accept only if Spearman with the pilot scores is ≥ 0.9.
+
+## Decisions still open (recommendations in bold)
+
+- ~~Arm size K~~ **DECIDED 2026-10-26: K = 10,000** (10% of the pool, about 2.5 h of T4 time per arm).
+  The notebook default of 40,000 would take about 10 h per arm.
+- **Arm A (whole pool, ~95K rows)**: about 24 h of training on its own. **Train it last, with checkpoint resume over 2–3 sessions**,
+  or replace it with a compute-matched run (the same number of steps as a 10K arm).
+- **τ (diversity threshold)**: **set it from Stage 2's nearest-neighbour similarity quantiles** (`embedding_sanity.json`),
+  so the diversity step removes rows and arm C differs from arm E.
+- **Seeds**: train B and C (the main comparison) with 3 seeds once single-seed results are in.
