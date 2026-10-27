@@ -1,0 +1,17 @@
+{
+  "id": "habiburrahman153/bn-full-s02-ifd-embed",
+  "title": "bn-full-s02-ifd-embed",
+  "code_file": "s02_ifd_embed.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "kernel_sources": ["habiburrahman153/bn-full-s01-clean"],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}

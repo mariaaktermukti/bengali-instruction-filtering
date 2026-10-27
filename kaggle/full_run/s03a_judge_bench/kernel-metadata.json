@@ -1,0 +1,17 @@
+{
+  "id": "habiburrahman153/bn-full-s03a-judge-bench",
+  "title": "bn-full-s03a-judge-bench",
+  "code_file": "s03a_judge_bench.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "kernel_sources": ["habiburrahman153/bangla-filtering-selection"],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}

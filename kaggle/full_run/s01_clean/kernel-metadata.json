@@ -1,0 +1,16 @@
+{
+  "id": "habiburrahman153/bn-full-s01-clean",
+  "title": "bn-full-s01-clean",
+  "code_file": "s01_clean.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}
