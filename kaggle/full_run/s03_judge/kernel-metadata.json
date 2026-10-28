@@ -1,0 +1,20 @@
+{
+  "id": "habiburrahman153/bn-full-s03-judge-02",
+  "title": "bn-full-s03-judge-02",
+  "code_file": "s03_judge.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "kernel_sources": [
+    "habiburrahman153/bn-full-s01-clean",
+    "habiburrahman153/bn-full-s03-judge-01"
+  ],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}
