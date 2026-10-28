@@ -288,7 +288,11 @@ def main():
     pip = subprocess.run([sys.executable, "-m", "pip", "install", "-q", "vllm"], capture_output=True, text=True)
     report["vllm_install"] = {"ok": pip.returncode == 0, "seconds": round(time.time() - t),
                               "stderr_tail": pip.stderr[-2_000:]}
-    ver = subprocess.run([sys.executable, "-c", "import vllm, torch; print(vllm.__version__, torch.__version__)"],
+    # vllm upgrades torch (v1: 2.13+cu130) but leaves Kaggle's cu128 torchaudio, which transformers then imports and
+    # crashes on. vllm does not need torchaudio, so remove it.
+    subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "-q", "torchaudio"], capture_output=True, text=True)
+    ver = subprocess.run([sys.executable, "-c", "import vllm, torch; print(vllm.__version__, torch.__version__, "
+                          "torch.version.cuda, torch.cuda.is_available(), torch.cuda.device_count())"],
                          capture_output=True, text=True)
     report["vllm_install"]["versions"] = (ver.stdout or ver.stderr).strip()[-500:]
     print("vllm install:", report["vllm_install"]["ok"], report["vllm_install"]["versions"], flush=True)
