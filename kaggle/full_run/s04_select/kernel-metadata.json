@@ -1,0 +1,23 @@
+{
+  "id": "habiburrahman153/bn-full-s04-select",
+  "title": "bn-full-s04-select",
+  "code_file": "s04_select.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "dataset_sources": [],
+  "kernel_sources": [
+    "habiburrahman153/bn-full-s01-clean",
+    "habiburrahman153/bn-full-s02-ifd-embed",
+    "habiburrahman153/bn-full-s02b-ifd-qwen",
+    "habiburrahman153/bn-full-s03-judge-01",
+    "habiburrahman153/bn-full-s03-judge-02",
+    "habiburrahman153/bn-full-s03-judge-03"
+  ],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}

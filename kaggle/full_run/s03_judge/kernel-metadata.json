@@ -1,6 +1,6 @@
 {
-  "id": "habiburrahman153/bn-full-s03-judge-02",
-  "title": "bn-full-s03-judge-02",
+  "id": "habiburrahman153/bn-full-s03-judge-03",
+  "title": "bn-full-s03-judge-03",
   "code_file": "s03_judge.py",
   "language": "python",
   "kernel_type": "script",
@@ -12,7 +12,8 @@
   "dataset_sources": [],
   "kernel_sources": [
     "habiburrahman153/bn-full-s01-clean",
-    "habiburrahman153/bn-full-s03-judge-01"
+    "habiburrahman153/bn-full-s03-judge-01",
+    "habiburrahman153/bn-full-s03-judge-02"
   ],
   "competition_sources": [],
   "model_sources": [],
