@@ -3,10 +3,11 @@
 Same logic as the pilot notebook (cell 22 tail, 23, 27-31), with two changes for the full pool:
   * the DEITA greedy step runs in numpy (fp32) instead of torch fp16 on a GPU;
   * a tau sweep first records, for each tau, how deep into the s-ranking the greedy step has to go to fill K
-    rows, how many it rejects and how much arm C overlaps arm E. The arms are built with TAU_SIM (default 0.90,
-    the notebook's value); if C and E barely differ, rerun with a lower TAU_SIM (CPU, no GPU quota).
+    rows, how many it rejects and how much arm C overlaps arm E. The arms are built with TAU_SIM (default 0.74;
+    the notebook's 0.90 left C 91.5% identical to E on the full pool, see the v1/v2 notes in HANDOFF.md).
 
-Kaggle: CPU kernel, inputs = outputs of bn-full-s01-clean, bn-full-s02-ifd-embed and every bn-full-s03-judge-NN.
+Kaggle: CPU kernel, inputs = outputs of bn-full-s01-clean, bn-full-s02-ifd-embed, bn-full-s02b-ifd-qwen (IFD for arm F)
+and every bn-full-s03-judge-NN.
 Outputs under /kaggle/working/bangla_filtering/full/:
     arms/arm_{A..F}.jsonl, arms/heldout.jsonl    training / eval files (format of notebook cell 29)
     pool/pool_scored.parquet                     pool + c, q, s, parse_ok, ifd, ppl
@@ -27,8 +28,9 @@ for sub in ["pool", "arms", "reports"]:
 
 SEED = 42
 SUBSET_SIZE = int(os.environ.get("SUBSET_SIZE", "10000"))           # K, decided 2026-10-26
-TAU_SIM = float(os.environ.get("TAU_SIM", "0.90"))
-TAU_GRID = [0.80, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96]
+# v1 used the notebook's 0.90: C∩E 91.5%. 0.74 ≈ the pool's NN-sim p25 (0.746, Stage 2) and gives C∩E 58% (v2 sweep)
+TAU_SIM = float(os.environ.get("TAU_SIM", "0.74"))
+TAU_GRID = [0.65, 0.70, 0.72, 0.74, 0.76, 0.78, 0.80, 0.84, 0.88, 0.90, 0.92, 0.96]   # v1: C∩E 91.5% at 0.90
 JUDGE_MIN_MASS = 0.5
 MIN_JUDGE_COVERAGE = 0.99         # refuse to build arms on a judge run that is clearly unfinished
 WORD = re.compile(r"[ঀ-৿‌‍A-Za-z0-9]+")                   # as in s01_clean.py
@@ -52,10 +54,24 @@ def log(msg):
 pool = pd.read_parquet(find_input("full/pool/pool_clean.parquet"))
 heldout = pd.read_parquet(find_input("full/pool/heldout.parquet"))
 
-ppl = pd.read_parquet(find_input("full/scores/ppl_ifd.parquet"))
+ppl = pd.read_parquet(find_input("full/scores/ppl_ifd.parquet"))          # Stage 2, Llama-3.2-1B
 pool = pool.merge(ppl, on="id", how="left")
-pool["ppl"] = np.exp(pool["nll_uncond"])
-pool["ifd"] = np.exp(pool["nll_cond"] - pool["nll_uncond"])
+pool["ifd_llama"] = np.exp(pool["nll_cond"] - pool["nll_uncond"])
+# Stage 2b: IFD with Qwen2.5-0.5B-Instruct, the model Stage 5 trains (Cherry-LLM scores with the tuned model).
+# Arm F uses it when attached; otherwise it falls back to the Llama IFD.
+qwen_files = sorted(glob.glob(f"{INPUT}/**/full/scores/ifd_qwen.parquet", recursive=True))
+if qwen_files:
+    qwen = pd.read_parquet(qwen_files[0]).rename(columns={"nll_cond": "nll_cond_qwen", "nll_uncond": "nll_uncond_qwen"})
+    pool = pool.merge(qwen, on="id", how="left")
+    pool["ifd_qwen"] = np.exp(pool["nll_cond_qwen"] - pool["nll_uncond_qwen"])
+    pool["ppl"] = np.exp(pool["nll_uncond_qwen"])
+    pool["ifd"] = pool["ifd_qwen"]
+    IFD_SOURCE = "Qwen/Qwen2.5-0.5B-Instruct"
+else:
+    pool["ppl"] = np.exp(pool["nll_uncond"])
+    pool["ifd"] = pool["ifd_llama"]
+    IFD_SOURCE = "unsloth/Llama-3.2-1B"
+print(f"IFD source: {IFD_SOURCE} | rows with IFD: {pool['ifd'].notna().sum():,}", flush=True)
 
 # every judge session's output; the last one already holds all rows, but merging is harmless
 judge_files = sorted(glob.glob(f"{INPUT}/**/full/scores/judge_en.parquet", recursive=True))
@@ -97,7 +113,9 @@ judge_report = {
     "spearman_c_vs_instr_len": round(spearmanr(pool.c, pool.instr_tokens, nan_policy="omit")[0], 3),
     "spearman_q_vs_resp_len":  round(spearmanr(pool.q, pool.resp_tokens, nan_policy="omit")[0], 3),
     "spearman_c_vs_q":         round(spearmanr(pool.c, pool.q, nan_policy="omit")[0], 3),
+    "ifd_source": IFD_SOURCE,
     "spearman_q_vs_ifd":       round(spearmanr(pool.q, pool.ifd, nan_policy="omit")[0], 3),
+    "spearman_ifd_vs_ifd_llama": round(spearmanr(pool.ifd, pool.ifd_llama, nan_policy="omit")[0], 3),
     "spearman_s_vs_c":         round(spearmanr(pool.s, pool.c, nan_policy="omit")[0], 3),
     "q_share_ge_4_9": round(float((pool.q >= 4.9).mean()), 4),
     "q_share_lt_4":   round(float((pool.q < 4).mean()), 4),
@@ -276,7 +294,7 @@ for _, r in pool[pool.parse_ok].nsmallest(3, "s").iterrows():
     print(f"\n[s={r.s:.2f} c={r.c:.2f} q={r.q:.2f}] {r.instruction[:150]}\n→ {r.output[:200]}")
 
 manifest = {
-    "subset_size": K, "tau_requested": TAU_SIM, "tau_used": TAU_USED, "c_depth": c_depth,
+    "subset_size": K, "ifd_source": IFD_SOURCE, "tau_requested": TAU_SIM, "tau_used": TAU_USED, "c_depth": c_depth,
     "pool_rows_clean": len(pool), "heldout_rows": len(heldout), "scorable_rows": len(scored),
     "arms": {a: len(ix) for a, ix in ARMS.items()}, "overlaps": overlaps,
     "arm_D_q_cut": round(q_cut, 4), "rows_q_ge_D_cut": int((pool.q >= q_cut).sum()),
