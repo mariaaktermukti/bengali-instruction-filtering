@@ -25,8 +25,8 @@ Live status and the next command to run: [HANDOFF.md](../../HANDOFF.md).
 | 1 | `bn-full-s01-clean` | CPU | sample 100K + 500 held-out, normalise, filters, dedup, decontamination, token counts | 11 min | done: 91,120 pool / 470 held-out |
 | 2 | `bn-full-s02-ifd-embed` | 2×T4 | IFD with Llama-3.2-1B (one half of the rows per GPU), bge-m3 embeddings, τ calibration stats | ~3.5 h | done: 223 min |
 | 3a | `bn-full-s03a-judge-bench` | 2×T4 | judge throughput benchmark on the 955 pilot rows: HF backend vs vLLM fp16 TP2, AWQ and GPTQ-Int8 (one copy per GPU), Spearman agreement with the pilot scores | ~1 h | done: vllm_tp2 chosen (4,374 rows/h, ρ 1.000) |
-| 3 | `bn-full-s03-judge-NN` | 2×T4 | LLM judge c, q for all rows; each run resumes from the previous runs' outputs | ~21 h (2–3 sessions) | session 01 done (46,000 rows, 4,458 rows/h, parse 1.00); session 02 running |
-| 4 | `bn-full-s04-select` | CPU | build arms A–F, recalibrate τ, diagnostics | < 1 h | to write |
+| 3 | `bn-full-s03-judge-NN` | 2×T4 | LLM judge c, q for all rows; each run resumes from the previous runs' outputs | ~21 h (2–3 sessions) | S01 + S02 done (90,000 / 91,120); S03 for the last 1,120 rows |
+| 4 | `bn-full-s04-select` | CPU | build arms A–F, recalibrate τ, diagnostics | < 1 h | written, tested on synthetic data; push after Stage 3 |
 | 5 | `bn-full-lora-<arm>` | 2×T4 | LoRA per arm, two arms at once (one per GPU) | ~2.5 h per 10K-row arm | adapt `scripts/kaggle_lora_training.py` |
 | 6 | `bn-full-eval` | T4 | held-out loss per model (500 rows) + bootstrap | ~1–2 h | adapt `scripts/heldout_per_example.py` |
 
