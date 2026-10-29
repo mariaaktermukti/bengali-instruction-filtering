@@ -16,8 +16,8 @@ Live status and the next command to run: [HANDOFF.md](../../HANDOFF.md).
 - `machine_shape: NvidiaTeslaT4` gives **2 × T4** (16 GB each, no native bf16). Quota counts session
   time, not GPUs, so every GPU stage keeps both T4s busy.
 - CPU kernels do not use GPU quota.
-- Account `habiburrahman153` used up its weekly GPU quota on 2026-10-30 (stages 1–3 + 2b). Stage 5 onward runs on a second
-  account; a private kernel's output cannot be attached across accounts, so the arms move over as a private dataset (HANDOFF.md).
+- Account `habiburrahman153` used up its weekly GPU quota on 2026-10-30 (stages 1–3 + 2b). Stage 5 onward runs on
+  `habiburrahman118`; a private kernel's output cannot be attached across accounts, so the arms move over as a private dataset (HANDOFF.md).
 - A kernel whose session is killed at 12 h loses its output, so scoring stages checkpoint and stop on a time budget.
 
 ## Stages
@@ -26,11 +26,11 @@ Live status and the next command to run: [HANDOFF.md](../../HANDOFF.md).
 | --- | --- | --- | --- | --- | --- |
 | 1 | `bn-full-s01-clean` | CPU | sample 100K + 500 held-out, normalise, filters, dedup, decontamination, token counts | 11 min | done: 91,120 pool / 470 held-out |
 | 2 | `bn-full-s02-ifd-embed` | 2×T4 | IFD with Llama-3.2-1B (one half of the rows per GPU), bge-m3 embeddings, τ calibration stats | ~3.5 h | done: 223 min |
-| 2b | `bn-full-s02b-ifd-qwen` | 2×T4 | IFD again with Qwen2.5-0.5B-Instruct, the model Stage 5 trains (arm F) | ~1.5 h | running (pushed 2026-10-30) |
+| 2b | `bn-full-s02b-ifd-qwen` | 2×T4 | IFD again with Qwen2.5-0.5B-Instruct, the model Stage 5 trains (arm F) | ~1.5 h | done: 101 min, 0 NaN, Spearman 0.68 vs Llama IFD |
 | 3a | `bn-full-s03a-judge-bench` | 2×T4 | judge throughput benchmark on the 955 pilot rows: HF backend vs vLLM fp16 TP2, AWQ and GPTQ-Int8 (one copy per GPU), Spearman agreement with the pilot scores | ~1 h | done: vllm_tp2 chosen (4,374 rows/h, ρ 1.000) |
 | 3 | `bn-full-s03-judge-NN` | 2×T4 | LLM judge c, q for all rows; each run resumes from the previous runs' outputs | ~21 h (2–3 sessions) | done: 91,120 rows in 3 sessions (S01 623 min, S02 629, S03 24), parse 1.00 |
-| 4 | `bn-full-s04-select` | CPU | build arms A–F, recalibrate τ, diagnostics | < 1 h | done (v3, τ 0.74, C∩E 58%; v1 at τ 0.90 gave 91.5%) |
-| 5 | `bn-full-lora-<arm>` | 2×T4 | LoRA (Qwen2.5-0.5B-Instruct) per arm, two arms at once (one per GPU); **second Kaggle account**, arms attached as a private dataset | ~2.4 h per 10K-row arm | adapt `scripts/kaggle_lora_training.py` |
+| 4 | `bn-full-s04-select` | CPU | build arms A–F, recalibrate τ, diagnostics | < 1 h | done: v4 (τ 0.74, C∩E 58%; arm F from the Qwen IFD) |
+| 5 | `habiburrahman118/bn-full-s05-lora-NN` | 2×T4 | LoRA (Qwen2.5-0.5B-Instruct), a queue of runs per GPU; arms from the private dataset `habiburrahman118/bn-full-arms`; per-example held-out losses | ~2.3–2.8 h per 10K-row arm; B–F in one ~8 h session | session 01 running (B–F, pushed 2026-10-30) |
 | 6 | `bn-full-eval` | T4 | held-out loss per model (500 rows) + bootstrap | ~1–2 h | adapt `scripts/heldout_per_example.py` |
 
 Estimated GPU total: about 60–90 h, i.e. 2–3 weeks of Kaggle quota. The judge is the largest cost.
