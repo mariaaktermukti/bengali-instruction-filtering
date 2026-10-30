@@ -13,8 +13,8 @@ Update the **Status** table and **Next action** after every step, and add a line
 | 3a judge benchmark (2×T4) | `bn-full-s03a-judge-bench` | **DONE** (v2, 62 min; v1 was partial) | vLLM 0.32.0 works after uninstalling torchaudio (torch 2.13+cu130, cuda True, 2 GPUs). Rows/h and hours for 91,120 rows, Spearman c vs pilot / MAE: `hf` 2,763 (33.0 h, 0.9999 / 0.003); **`vllm_tp2` 4,374 (20.8 h, 1.0000 / 0.0027)**; `awq_dp2` 4,814 (18.9 h, 0.962 / 0.20, q 0.923); `gptq8_dp2` 4,243 (21.5 h, 0.999 / 0.014). Parse 1.00 everywhere, max prompt 3,131 tok. Script `recommended` = `awq_dp2`, but the rule is max rows/h with no quality check. **Use `vllm_tp2`**: AWQ is only 10% faster and changes the ranking (MAE 0.20) |
 | 3 judge (2×T4) | `bn-full-s03-judge-01`, `-02`, ... | **S01 DONE** (623 min); **S02 DONE** (629 min, 90,000 / 91,120); **S03 DONE** (24 min) → **Stage 3 COMPLETE: 91,120 / 91,120, parse 1.00** | S01: **46,000 / 91,120** scored, 4,458 rows/h, parse 1.00, clean stop at the time budget, no crash or eager retry. Startup 9 min, 26.7 min per chunk. S02: +44,000 -> **90,000 / 91,120**, 4,244 rows/h (28 min per chunk, 5% slower than S01), parse 1.00, stopped at the budget **1,120 rows short**. Merged parquet checked: 90,000 unique ids, no nulls, S01 scores identical; S02's new rows have the same c/q distributions. S03 needs ~15 min scoring + ~9 min startup. On the S01 rows, c: median 4.00, p10 2.18, p90 4.79. **q has a ceiling**: median 5.00, 71% ≥ 4.9, but 18% < 4 and 7% < 3. Spearman(c, q) = −0.23. Median c by domain: translation 2.23, mcq 2.78, other 2.95, the rest 3.7–4.0 |
 | 4 select arms (CPU) | `bn-full-s04-select` | **DONE: v4** (τ 0.74, arm F from the Qwen IFD) | v1 τ 0.90, v2 sweep, v3 τ 0.74 + Llama IFD, **v4 = final**. Arms A 91,120, B–F 10,000; held-out 470; in `outputs/full/s04_v4/` (`s04/` = v3, `s04_v1_tau090/` = v1, both stale). A–E identical to v3. τ 0.74 ≈ pool NN-sim p25 (0.746): **C∩E 58%**. C / E / B: mean_pair_sim .379 / .391 / .386, distinct-2 .503 / .451 / .515, coverage .746 / .727 / .757, c_mean 4.49 / 4.74 / 3.71. Code share: pool 11.4%, C 3.0%, E 1.4%, **F 21.2%** (v3 Llama F: 7.9%). Tokens: B 12.2M, C 15.5M, D 15.5M, E 15.2M, **F 10.9M**. C∩F 7.3%. D cut q ≥ 5.44 |
-| 5 LoRA per arm (2×T4) | `habiburrahman118/bn-full-s05-lora-NN` | **smoke test PASSED** (6.7 min); **session 01 RUNNING** (pushed 2026-10-30 02:46 BST, expect done ~09:00–11:00 BST) | `kaggle/full_run/s05_lora/`. Qwen2.5-0.5B-Instruct, pilot hyper-parameters. Per-GPU queues (session 01: GPU0 C → D, GPU1 B → E → F, ~6–8 h), checkpoint every 250 steps, stop at 10.5 h, resume by attaching the previous session. Writes per-example held-out losses per run + base, so Stage 6 is only the bootstrap. Smoke (200 rows, 20 steps, 30 held-out rows): all 5 runs on both GPUs, peak 7.6 GB, base held-out 1.087 → 1.04–1.08 after 20 steps; output in `outputs/full/s05_smoke/` |
-| 6 eval | - | not written | - |
+| 5 LoRA per arm (2×T4) | `habiburrahman118/bn-full-s05-lora-NN` | **session 01 DONE** (419 min); **session 02 RUNNING** (pushed 2026-10-30 13:51 BST, expect done ~19:30 BST) | `kaggle/full_run/s05_lora/`. Qwen2.5-0.5B-Instruct, pilot hyper-parameters, per-GPU queues, checkpoint every 250 steps, stop at 10.5 h, resume by attaching the previous session. S01: B, C, D, E, F seed 42, all 2,500 / 2,500 steps, no NaN, peak 7.6 GB; training min B 131, C 171, D 176, E 162, F 116; output in `outputs/full/s05_01/`. S02: seeds 43, 44 for B and C |
+| 6 eval (CPU, local) | `kaggle/full_run/s06_eval/s06_bootstrap.py` | **seed 42 DONE**; rerun after S02 | `results/full_run/`. 470 held-out rows. Per-example mean loss (paired diff vs B, 95% CI): base .978, **B .813**, F .827 (+.014 [.010, .017]), C .838 (+.025 [.018, .032]), D .857 (+.044 [.035, .053]), E .863 (+.050 [.038, .062]). Token-weighted: B .8176, C .8185 (+.001 [−.001, .003], tie), E .825, D .831, F .833. **Code drives it** (70 rows): F .843, B .860, C .992, D 1.027, E 1.124; 80% of the C−B gap. Non-code (400 rows): B .805, C .811 (+.006 [.003, .009]), E .817, F .824, D .827. No arm beats random so far. Single seed: CIs exclude seed variance |
 
 Stage 1 caveat: the filter-bias check flagged **code (20.7% dropped, mostly `language`: 3,038 rows)** and
 **mcq_classification (21.0%, mostly `translationese`: 366 rows)**. The pilot showed the same pattern (code 19%).
@@ -32,19 +32,19 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
    `~/.kaggle/access_token.habiburrahman153`). Arms uploaded as the private dataset **`habiburrahman118/bn-full-arms`**
    (A–F, held-out, `stage4_manifest.json`, `arm_diagnostics.csv`). Note: `kaggle datasets create -p <relative path>` fails on
    Windows (temp-path bug); run it from inside the folder with `-p .`.
-3. **Stage 5 session 01 is RUNNING** (`habiburrahman118/bn-full-s05-lora-01`, pushed 2026-10-30 02:46 BST; smoke test passed).
-   GPU0: C → D, GPU1: B → E → F, ~6–8 h, hard stop at 10.5 h. Check it:
+3. ~~Stage 5 session 01~~ done (5 runs complete); ~~Stage 6 on seed 42~~ done (`results/full_run/`).
+   **Stage 5 session 02 is RUNNING** (`habiburrahman118/bn-full-s05-lora-02`, pushed 2026-10-30 13:51 BST; session 01 attached).
+   GPU0: C43 → B43, GPU1: C44 → B44, ~5.2 h, expect done ~19:30 BST. Check it, then rerun Stage 6 (it averages seeds per arm):
    ```bash
    export PYTHONUTF8=1
-   kaggle kernels status habiburrahman118/bn-full-s05-lora-01
-   kaggle kernels output habiburrahman118/bn-full-s05-lora-01 -p outputs/full/s05_01
-   cat outputs/full/s05_01/bangla_filtering/full/lora/stage5_summary.json
+   kaggle kernels status habiburrahman118/bn-full-s05-lora-02
+   kaggle kernels output habiburrahman118/bn-full-s05-lora-02 -p outputs/full/s05_02
+   cat outputs/full/s05_02/bangla_filtering/full/lora/stage5_summary.json
+   python kaggle/full_run/s06_eval/s06_bootstrap.py outputs/full/s05_02
    ```
-   Expect 5 runs with `complete: true`. Then Stage 6 (bootstrap on CPU, `scripts/compare_arms_bootstrap.py` on the
-   per-example CSVs) and the next training session (extra seeds for B, C; arm A).
-   If the log says INCOMPLETE: copy the kernel dir, set id `bn-full-s05-lora-02`, add `habiburrahman118/bn-full-s05-lora-01`
-   to `kernel_sources`, keep the same QUEUES (finished runs are skipped, unfinished ones resume) and push.
-   Later sessions: extra seeds for B and C (`("B", 43), ("C", 43)`, then 44), and arm A (decision open).
+   Expect 9 runs with `complete: true` (5 carried over + 4 new). `results/full_run/per_seed.csv` shows the seed spread; the
+   bootstrap intervals cover held-out sampling only. If the log says INCOMPLETE: bump the id to `-03`, attach `-02`, keep QUEUES, push.
+   After that: **decide arm A** (below) and the downstream benchmarks (ROADMAP phase 4).
 4. Report in the paper: token totals differ per arm (C +27%, F −10% vs B), so compare per token as well as per row; code is under-selected by c × q.
 
 ## Decisions
@@ -53,7 +53,8 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
 - **τ = 0.74** (2026-10-30): the notebook's 0.90 left C 91.5% identical to E; 0.74 ≈ pool NN-sim p25, C∩E 58%.
 - **Base model for LoRA: Qwen2.5-0.5B-Instruct** (user, 2026-10-30): ~2.4 h per 10K arm vs ~5–6 h for Llama-3.2-1B; IFD recomputed with it (Stage 2b) so arm F matches.
 - **Kaggle accounts** (2026-10-30): stages 1–4 on `habiburrahman153`; Stage 5 onward on **`habiburrahman118`**.
-- Arm A (whole pool, 91,120 rows, ~22 h with Qwen-0.5B): still open. Options: multi-session training with resume, or a compute-matched run.
+- Arm A (whole pool, 91,120 rows): still open (user). Now ~20 h on one GPU at session 01's rate, so 2 sessions with the other GPU free for more runs. **Recommendation: full run.** A compute-matched run (2,500 steps on the whole pool) is just another random 10K rows, i.e. arm B, so it cannot answer "how close to the whole pool".
+- `habiburrahman118` GPU quota: ~12.3 h used this week after S02 (S01 7 h + S02 ~5.2 h + smoke), so ~17.7 h left of ~30 h; full arm A needs the next week's quota too.
 
 ## Conventions
 
@@ -88,3 +89,4 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
 - 2026-10-30: Stage 2b done (101 min): Qwen IFD for all 91,120 rows, 0 NaN, Spearman 0.68 vs Llama IFD. Stage 4 v4 done: arm F rebuilt (code 21.2%, 10.9M tokens), A–E unchanged. Arms downloaded. Account 1 done; next is the account switch.
 - 2026-10-30: arms verified and uploaded as private dataset `habiburrahman118/bn-full-arms` (CLI switched to habiburrahman118). Wrote Stage 5 (`s05_lora.py`: per-GPU queues, checkpoint/resume, time budget, per-example held-out losses).
 - 2026-10-30: dataset upload done. Stage 5 smoke test passed (6.7 min, all 5 runs, both GPUs). Moved the adapter save before the held-out eval. **Pushed Stage 5 session 01** (02:46 BST).
+- 2026-10-30: Stage 5 session 01 done (419 min): B–F seed 42 complete, files verified (470 ids, 0 NaN). Stage 6 on seed 42: B best on per-example loss, C ties B token-weighted, code explains 80% of C−B. `compare_arms_bootstrap.py` got an optional OUT_DIR so the pilot's results stay untouched. Pushed Stage 5 session 02 (13:51 BST): seeds 43, 44 for B and C, one of each per GPU (~5.2 h, vs ~5.8 h with both C runs on one GPU).

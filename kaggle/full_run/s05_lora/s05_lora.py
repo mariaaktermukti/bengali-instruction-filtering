@@ -24,9 +24,10 @@ FINISH_MARGIN_MIN = 20          # held-out eval + generations + saving after the
 MIN_START_MIN = 30              # do not start a new run with less time than this left
 
 # Edit per session. GPU 0 and GPU 1 each run their queue in order. Tokens (Stage 4 v4): B 12.2M, C 15.5M, D 15.5M,
-# E 15.2M, F 10.9M; the pilot trained at ~0.85 s per row, so a 10K arm takes ~2.3-2.8 h.
-QUEUES = {0: [("C", 42), ("D", 42)],
-          1: [("B", 42), ("E", 42), ("F", 42)]}
+# E 15.2M, F 10.9M. Session 01 took B 131, C 171, D 176, E 162, F 116 min of training.
+# Session 01: {0: [C42, D42], 1: [B42, E42, F42]}. Session 02: extra seeds, one B + one C per GPU (~5.2 h each).
+QUEUES = {0: [("C", 43), ("B", 43)],
+          1: [("C", 44), ("B", 44)]}
 SMOKE = False                   # True: 200 rows, 20 steps, 30 held-out rows, to test the kernel in ~15 min
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"

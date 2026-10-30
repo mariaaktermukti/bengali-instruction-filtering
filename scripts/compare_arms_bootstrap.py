@@ -1,6 +1,6 @@
 """Paired bootstrap comparison of held-out loss across arms.
 
-    python scripts/compare_arms_bootstrap.py PER_EXAMPLE_CSV
+    python scripts/compare_arms_bootstrap.py PER_EXAMPLE_CSV [OUT_DIR]
 
 Reads the output of heldout_per_example.py. For every model it reports the mean
 held-out loss and, against the base model and against arm B (random selection),
@@ -19,8 +19,7 @@ REFERENCE_ARM = "B"
 N_BOOTSTRAP = 10_000
 SEED = 42
 
-OUTPUT_FILE = "results/lora_arms/heldout_comparison.csv"
-DOMAIN_FILE = "results/lora_arms/heldout_by_domain.csv"
+OUTPUT_DIR = "results/lora_arms"
 
 
 def load(path):
@@ -50,6 +49,10 @@ def paired_interval(a, b, rng):
 def main():
 
     losses, domains = load(sys.argv[1])
+
+    output_dir = sys.argv[2] if len(sys.argv) > 2 else OUTPUT_DIR
+    output_file = os.path.join(output_dir, "heldout_comparison.csv")
+    domain_file = os.path.join(output_dir, "heldout_by_domain.csv")
 
     ids = sorted(losses["base"])
     vectors = {m: np.array([losses[m][i] for i in ids]) for m in losses}
@@ -82,9 +85,9 @@ def main():
         columns += [f"diff_vs_{ref_name}", f"ci95_low_vs_{ref_name}",
                     f"ci95_high_vs_{ref_name}", f"p_lower_vs_{ref_name}"]
 
-    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8", newline="") as f:
+    with open(output_file, "w", encoding="utf-8", newline="") as f:
 
         writer = csv.DictWriter(f, fieldnames=columns)
         writer.writeheader()
@@ -101,7 +104,7 @@ def main():
     for i, example_id in enumerate(ids):
         domain_ids[domains[example_id]].append(i)
 
-    with open(DOMAIN_FILE, "w", encoding="utf-8", newline="") as f:
+    with open(domain_file, "w", encoding="utf-8", newline="") as f:
 
         writer = csv.writer(f)
         writer.writerow(["model", "domain", "n", "mean_loss"])
@@ -110,8 +113,8 @@ def main():
             for domain, idx in sorted(domain_ids.items(), key=lambda x: -len(x[1])):
                 writer.writerow([model, domain, len(idx), round(float(vector[idx].mean()), 4)])
 
-    print("\nSaved:", OUTPUT_FILE)
-    print("Saved:", DOMAIN_FILE)
+    print("\nSaved:", output_file)
+    print("Saved:", domain_file)
 
 
 if __name__ == "__main__":

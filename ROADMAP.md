@@ -14,17 +14,16 @@ to training on the whole clean pool?
 | 0. Pilot (1K rows) | 4 | 5 |
 | 1. Full-run data pipeline | 5 | 5 |
 | 2. Arm selection | 4 | 5 |
-| 3. Training | 3 | 6 |
-| 4. Evaluation | 0 | 5 |
+| 3. Training | 4 | 6 |
+| 4. Evaluation | 2 | 5 |
 | 5. Analysis | 0 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **16** | **39** |
+| **All** | **19** | **39** |
 
-Status as of 2026-10-30: the expensive data work is finished (~47 GPU-hours spent). **No full-scale model results exist yet**,
-and the paper's results section depends entirely on phases 3–5.
+Status as of 2026-10-30: the expensive data work is finished (~47 GPU-hours spent). **First full-scale results exist (seed 42): no selection arm beats random (B) on held-out loss**; C ties B when weighted by tokens, and code rows explain 80% of the C−B gap.
 
-Estimated GPU time left: about 20–45 h (1–2 weeks of the Kaggle quota, ~30 h per week), mostly LoRA training.
-**Data and arms are final** (Stage 4 v4). **Now:** Stage 5 session 01 is training arms B–F on habiburrahman118 (pushed 2026-10-30 02:46 BST, ~6–8 h). Details: [HANDOFF.md](HANDOFF.md) → Next action.
+Estimated GPU time left: about 25–35 h (~5 h seeds, ~20 h arm A, plus benchmarks), 1–2 weeks of the Kaggle quota (~30 h per week).
+**Data and arms are final** (Stage 4 v4). **Now:** Stage 5 session 02 is training seeds 43, 44 for B and C on habiburrahman118 (pushed 2026-10-30 13:51 BST, ~5.2 h). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
 ## 0. Pilot (Iteration 03, 1,000 rows)
 
@@ -55,14 +54,14 @@ Estimated GPU time left: about 20–45 h (1–2 weeks of the Kaggle quota, ~30 h
 - [x] Base model: **Qwen2.5-0.5B-Instruct** (~2.4 h per 10K arm vs ~5–6 h for Llama-3.2-1B; matches the pilot). IFD redone with it in Stage 2b (2026-10-30)
 - [x] Switched to Kaggle account **habiburrahman118**; arms uploaded as private dataset `habiburrahman118/bn-full-arms` (2026-10-30)
 - [x] Stage 5 kernel (`kaggle/full_run/s05_lora/`: per-GPU queues, checkpoint/resume), smoke test passed (2026-10-30)
-- [ ] Train B, C, D, E, F (seed 42) in one session: GPU0 C → D, GPU1 B → E → F (~6–8 h) ← *running, session 01 pushed 2026-10-30 02:46 BST*
-- [ ] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison
-- [ ] Arm A (whole pool): **decide** multi-session full run (~22 h) or a compute-matched run (same steps as a 10K arm)
+- [x] Train B, C, D, E, F (seed 42) in one session, all complete, 419 min (2026-10-30)
+- [ ] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison ← *running, session 02 pushed 2026-10-30 13:51 BST*
+- [ ] Arm A (whole pool): **decide** multi-session full run (~20 h, recommended) or a compute-matched run (same steps as a 10K arm, which amounts to arm B)
 
 ## 4. Evaluation (Stage 6)
 
-- [ ] Held-out loss per model on the 470 held-out rows (adapt `scripts/heldout_per_example.py`)
-- [ ] Paired bootstrap vs B and vs base (`scripts/compare_arms_bootstrap.py`), loss by domain
+- [x] Held-out loss per model on the 470 held-out rows, written by Stage 5 (2026-10-30)
+- [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_bootstrap.py`, `results/full_run/`); seed 42 done, rerun after session 02 (2026-10-30)
 - [ ] **Decide on downstream benchmarks.** Held-out loss alone is weak evidence for a paper. Candidates: Bengali MMLU (already in decontamination), mHumanEval-bn, a small generation eval judged pairwise
 - [ ] Run the downstream benchmarks for every model
 - [ ] Generation samples per arm (qualitative examples for the paper)
@@ -95,5 +94,5 @@ Estimated GPU time left: about 20–45 h (1–2 weeks of the Kaggle quota, ~30 h
 | τ | **0.74** (2026-10-30) |
 | Base model for LoRA | **Qwen2.5-0.5B-Instruct** (2026-10-30) |
 | Kaggle account | stages 1–4: habiburrahman153; Stage 5+: **habiburrahman118** |
-| Arm A: full or compute-matched | open |
+| Arm A: full or compute-matched | open (recommendation: full) |
 | Downstream benchmarks | open |

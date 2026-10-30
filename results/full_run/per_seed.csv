@@ -1,0 +1,6 @@
+run,mean_loss,token_weighted_loss,train_tokens
+arm_B_seed42,0.813,0.8176,11192921
+arm_C_seed42,0.8377,0.8185,14183830
+arm_D_seed42,0.8567,0.8305,14161473
+arm_E_seed42,0.8627,0.8252,13898266
+arm_F_seed42,0.8266,0.833,10076782
