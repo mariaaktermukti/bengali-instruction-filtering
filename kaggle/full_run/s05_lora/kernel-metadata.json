@@ -1,0 +1,17 @@
+{
+  "id": "habiburrahman118/bn-full-s05-lora-02",
+  "title": "bn-full-s05-lora-02",
+  "code_file": "s05_lora.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": ["habiburrahman118/bn-full-arms"],
+  "kernel_sources": ["habiburrahman118/bn-full-s05-lora-01"],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}
