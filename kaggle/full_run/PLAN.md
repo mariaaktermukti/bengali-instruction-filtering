@@ -30,8 +30,8 @@ Live status and the next command to run: [HANDOFF.md](../../HANDOFF.md).
 | 3a | `bn-full-s03a-judge-bench` | 2×T4 | judge throughput benchmark on the 955 pilot rows: HF backend vs vLLM fp16 TP2, AWQ and GPTQ-Int8 (one copy per GPU), Spearman agreement with the pilot scores | ~1 h | done: vllm_tp2 chosen (4,374 rows/h, ρ 1.000) |
 | 3 | `bn-full-s03-judge-NN` | 2×T4 | LLM judge c, q for all rows; each run resumes from the previous runs' outputs | ~21 h (2–3 sessions) | done: 91,120 rows in 3 sessions (S01 623 min, S02 629, S03 24), parse 1.00 |
 | 4 | `bn-full-s04-select` | CPU | build arms A–F, recalibrate τ, diagnostics | < 1 h | done: v4 (τ 0.74, C∩E 58%; arm F from the Qwen IFD) |
-| 5 | `habiburrahman118/bn-full-s05-lora-NN` | 2×T4 | LoRA (Qwen2.5-0.5B-Instruct), a queue of runs per GPU; arms from the private dataset `habiburrahman118/bn-full-arms`; per-example held-out losses | 1.9–2.9 h per 10K-row arm; B–F in one ~7 h session | S01 done (B–F seed 42, 419 min); S02 running (seeds 43, 44 for B, C) |
-| 6 | `kaggle/full_run/s06_eval/s06_bootstrap.py` | CPU, local | paired bootstrap on the held-out losses Stage 5 wrote (470 rows), per-example and token-weighted | seconds | done for seed 42; rerun after S02 |
+| 5 | `habiburrahman118/bn-full-s05-lora-NN` | 2×T4 | LoRA (Qwen2.5-0.5B-Instruct), a queue of runs per GPU; arms from the private dataset `habiburrahman118/bn-full-arms`; per-example held-out losses | 1.9–2.9 h per 10K-row arm; B–F in one ~7 h session | S01 done (B–F seed 42, 419 min); S02 done (seeds 43, 44 for B, C, 318 min); S03 running (arm A part 1; seeds for D, E, F) |
+| 6 | `kaggle/full_run/s06_eval/s06_bootstrap.py` | CPU, local | paired bootstrap on the held-out losses Stage 5 wrote (470 rows), per-example and token-weighted | seconds | done through S02; rerun after each session |
 
 Estimated GPU total: about 60–90 h, i.e. 2–3 weeks of Kaggle quota. The judge is the largest cost.
 
@@ -51,8 +51,7 @@ Only one GPU computes at a time. Options that Stage 3a measures:
 
 - ~~Arm size K~~ **DECIDED 2026-10-26: K = 10,000** (10% of the pool, about 2.5 h of T4 time per arm).
   The notebook default of 40,000 would take about 10 h per arm.
-- **Arm A (whole pool, ~95K rows)**: about 24 h of training on its own. **Train it last, with checkpoint resume over 2–3 sessions**,
-  or replace it with a compute-matched run (the same number of steps as a 10K arm).
+- ~~Arm A~~ **DECIDED 2026-10-30: full run** (91,118 rows, 102.4M tokens, ~20.6 h) over 2 sessions with checkpoint resume; resume tested, exact match.
 - ~~τ (diversity threshold)~~ **DECIDED 2026-10-30: τ = 0.74** ≈ the pool's NN-sim p25 (0.746); C∩E 58% (0.90 gave 91.5%).
 - ~~Base model~~ **DECIDED 2026-10-30: Qwen2.5-0.5B-Instruct** (as in the pilot; IFD recomputed with it in Stage 2b).
-- **Seeds**: train B and C (the main comparison) with 3 seeds once single-seed results are in.
+- ~~Seeds~~ B and C have 3 seeds (S02); D, E, F get theirs on the GPU that arm A leaves free.

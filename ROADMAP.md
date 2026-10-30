@@ -14,16 +14,16 @@ to training on the whole clean pool?
 | 0. Pilot (1K rows) | 4 | 5 |
 | 1. Full-run data pipeline | 5 | 5 |
 | 2. Arm selection | 4 | 5 |
-| 3. Training | 4 | 6 |
+| 3. Training | 5 | 6 |
 | 4. Evaluation | 2 | 5 |
 | 5. Analysis | 0 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **19** | **39** |
+| **All** | **20** | **39** |
 
-Status as of 2026-10-30: the expensive data work is finished (~47 GPU-hours spent). **First full-scale results exist (seed 42): no selection arm beats random (B) on held-out loss**; C ties B when weighted by tokens, and code rows explain 80% of the C−B gap.
+Status as of 2026-10-30: the expensive data work is finished (~47 GPU-hours spent). **Full-scale results with 3 seeds for B and C: no selection arm beats random (B) on held-out loss**; the seed spread (~.001) is far below the C−B gap (.025), C nearly ties B when weighted by tokens (+.0014), and code rows explain 78% of the C−B gap.
 
-Estimated GPU time left: about 25–35 h (~5 h seeds, ~20 h arm A, plus benchmarks), 1–2 weeks of the Kaggle quota (~30 h per week).
-**Data and arms are final** (Stage 4 v4). **Now:** Stage 5 session 02 is training seeds 43, 44 for B and C on habiburrahman118 (pushed 2026-10-30 13:51 BST, ~5.2 h). Details: [HANDOFF.md](HANDOFF.md) → Next action.
+Estimated GPU time left: about 21 h for arm A, plus benchmarks, 1–2 weeks of the Kaggle quota (~30 h per week).
+**Data and arms are final** (Stage 4 v4). **Now:** Stage 5 session 03 is training arm A (part 1 of 2) and extra seeds for D, E, F on habiburrahman118 (pushed 2026-10-30 20:29 BST, 11 h). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
 ## 0. Pilot (Iteration 03, 1,000 rows)
 
@@ -55,8 +55,8 @@ Estimated GPU time left: about 25–35 h (~5 h seeds, ~20 h arm A, plus benchmar
 - [x] Switched to Kaggle account **habiburrahman118**; arms uploaded as private dataset `habiburrahman118/bn-full-arms` (2026-10-30)
 - [x] Stage 5 kernel (`kaggle/full_run/s05_lora/`: per-GPU queues, checkpoint/resume), smoke test passed (2026-10-30)
 - [x] Train B, C, D, E, F (seed 42) in one session, all complete, 419 min (2026-10-30)
-- [ ] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison ← *running, session 02 pushed 2026-10-30 13:51 BST*
-- [ ] Arm A (whole pool): **decide** multi-session full run (~20 h, recommended) or a compute-matched run (same steps as a 10K arm, which amounts to arm B)
+- [x] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison; seed spread ~.001 (2026-10-30)
+- [ ] Arm A (whole pool), full run over 2 sessions (~20.6 h); resume path tested, exact match ← *running, session 03 pushed 2026-10-30 20:29 BST*. D, E, F seeds 43, 44 train on the free GPU
 
 ## 4. Evaluation (Stage 6)
 
@@ -94,5 +94,5 @@ Estimated GPU time left: about 25–35 h (~5 h seeds, ~20 h arm A, plus benchmar
 | τ | **0.74** (2026-10-30) |
 | Base model for LoRA | **Qwen2.5-0.5B-Instruct** (2026-10-30) |
 | Kaggle account | stages 1–4: habiburrahman153; Stage 5+: **habiburrahman118** |
-| Arm A: full or compute-matched | open (recommendation: full) |
+| Arm A: full or compute-matched | **full** (2026-10-30; Claude took the standing recommendation, user can overrule) |
 | Downstream benchmarks | open |
