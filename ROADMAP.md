@@ -22,8 +22,8 @@ to training on the whole clean pool?
 
 Status as of 2026-10-30: the expensive data work is finished (~47 GPU-hours spent). **Full-scale results with 3 seeds for B and C: no selection arm beats random (B) on held-out loss**; the seed spread (~.001) is far below the C−B gap (.025), C nearly ties B when weighted by tokens (+.0014), and code rows explain 78% of the C−B gap.
 
-Estimated GPU time left: about 21 h for arm A, plus benchmarks, 1–2 weeks of the Kaggle quota (~30 h per week).
-**Data and arms are final** (Stage 4 v4). **Now:** Stage 5 session 03 is training arm A (part 1 of 2) and extra seeds for D, E, F on habiburrahman118 (pushed 2026-10-30 20:29 BST, 11 h). Details: [HANDOFF.md](HANDOFF.md) → Next action.
+Estimated GPU time left: about 10 h for arm A, plus benchmarks; user confirmed **30 h quota available** after reset (2026-10-31).
+**Data and arms are final** (Stage 4 v4). **Now:** Stage 5 session 04 is RUNNING (pushed 2026-10-31 10:50 BST): resume A from the verified step 11,798 / 22,780 checkpoint on GPU0; D44/E44 on GPU1. Budget 11 h; expected finish around 21:00 BST, subject to throughput. S03 has 13 completed runs; S04 should bring this to 16. Stage 6 results still cover S02; rerun on Kaggle CPU after S04 completes. Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
 ## 0. Pilot (Iteration 03, 1,000 rows)
 
@@ -56,7 +56,7 @@ Estimated GPU time left: about 21 h for arm A, plus benchmarks, 1–2 weeks of t
 - [x] Stage 5 kernel (`kaggle/full_run/s05_lora/`: per-GPU queues, checkpoint/resume), smoke test passed (2026-10-30)
 - [x] Train B, C, D, E, F (seed 42) in one session, all complete, 419 min (2026-10-30)
 - [x] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison; seed spread ~.001 (2026-10-30)
-- [ ] Arm A (whole pool), full run over 2 sessions (~20.6 h); resume path tested, exact match ← *running, session 03 pushed 2026-10-30 20:29 BST*. D, E, F seeds 43, 44 train on the free GPU
+- [ ] Arm A (whole pool), full run (~20.6 h); resume path tested, exact match ← *S04 RUNNING from S03's step 11,798 checkpoint (2026-10-31 10:50 BST)*. D43, E43, F43, F44 complete; D44/E44 queued on S04's GPU1
 
 ## 4. Evaluation (Stage 6)
 

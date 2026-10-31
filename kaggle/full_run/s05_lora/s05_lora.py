@@ -26,9 +26,10 @@ MIN_START_MIN = 30              # do not start a new run with less time than thi
 # Edit per session. GPU 0 and GPU 1 each run their queue in order. Tokens (Stage 4 v4): B 12.2M, C 15.5M, D 15.5M,
 # E 15.2M, F 10.9M. Session 01 took B 131, C 171, D 176, E 162, F 116 min of training.
 # Session 01: {0: [C42, D42], 1: [B42, E42, F42]}. Session 02: {0: [C43, B43], 1: [C44, B44]} (318 min).
-# Session 03: arm A (102.4M tokens, ~20.6 h, so two sessions) on GPU 0; the free GPU trains extra seeds for D, E, F (~9.8 h).
+# Session 03: A paused at step 11,798 / 22,780; D43, E43, F43, F44 completed.
+# Session 04: resume A (~10 h) on GPU 0; finish the third seeds for D and E (~5.6 h) on GPU 1.
 QUEUES = {0: [("A", 42)],
-          1: [("D", 43), ("E", 43), ("F", 43), ("F", 44)]}
+          1: [("D", 44), ("E", 44)]}
 SMOKE = False                   # True: 200 rows, 20 steps, 30 held-out rows, to test the kernel in ~15 min
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
