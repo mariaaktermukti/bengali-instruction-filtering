@@ -1,0 +1,17 @@
+{
+  "id": "habiburrahman118/bn-full-s07-benchmarks-01",
+  "title": "bn-full-s07-benchmarks-01",
+  "code_file": "s07_benchmarks.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": ["habiburrahman118/bn-full-arms"],
+  "kernel_sources": ["habiburrahman118/bn-full-s05-lora-04"],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}

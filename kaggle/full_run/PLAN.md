@@ -32,6 +32,7 @@ Live status and the next command to run: [HANDOFF.md](../../HANDOFF.md).
 | 4 | `bn-full-s04-select` | CPU | build arms A–F, recalibrate τ, diagnostics | < 1 h | done: v4 (τ 0.74, C∩E 58%; arm F from the Qwen IFD) |
 | 5 | `habiburrahman118/bn-full-s05-lora-NN` | 2×T4 | LoRA (Qwen2.5-0.5B-Instruct), a queue of runs per GPU; arms from the private dataset `habiburrahman118/bn-full-arms`; per-example held-out losses | 1.9–2.9 h per 10K-row arm; B–F in one ~7 h session | S01 done (B–F seed 42, 419 min); S02 done (seeds 43, 44 for B, C, 318 min); S03 running (arm A part 1; seeds for D, E, F) |
 | 6 | `kaggle/full_run/s06_eval/s06_bootstrap.py` | CPU, local | paired bootstrap on the held-out losses Stage 5 wrote (470 rows), per-example and token-weighted | seconds | done through S02; rerun after each session |
+| 7 | `habiburrahman118/bn-full-s07-benchmarks-NN` | 2×T4 | Bengali MMLU and BanglaRQA on base + 16 adapters; greedy generations on the 470 held-out prompts for base + seed 42 of each arm | not measured on T4; budget 6 h | ready, not pushed |
 
 Estimated GPU total: about 60–90 h, i.e. 2–3 weeks of Kaggle quota. The judge is the largest cost.
 

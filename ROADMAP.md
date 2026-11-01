@@ -14,16 +14,16 @@ to training on the whole clean pool?
 | 0. Pilot (1K rows) | 4 | 5 |
 | 1. Full-run data pipeline | 5 | 5 |
 | 2. Arm selection | 4 | 5 |
-| 3. Training | 5 | 6 |
+| 3. Training | 6 | 6 |
 | 4. Evaluation | 2 | 5 |
 | 5. Analysis | 0 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **20** | **39** |
+| **All** | **21** | **39** |
 
-Status as of 2026-10-30: the expensive data work is finished (~47 GPU-hours spent). **Full-scale results with 3 seeds for B and C: no selection arm beats random (B) on held-out loss**; the seed spread (~.001) is far below the C−B gap (.025), C nearly ties B when weighted by tokens (+.0014), and code rows explain 78% of the C−B gap.
+Status as of 2026-10-31: the expensive data and training work is finished. **Arm A (the full 91,120-row pool) is best overall at .7169 held-out loss; among 10K arms, random B is best at .8126.** C is +.0254 vs B per-example, but only +.0014 token-weighted with a CI crossing zero. F is +.0133 vs B per-example. The seed spread remains small (~.001).
 
-Estimated GPU time left: about 10 h for arm A, plus benchmarks; user confirmed **30 h quota available** after reset (2026-10-31).
-**Data and arms are final** (Stage 4 v4). **Now:** Stage 5 session 04 is RUNNING (pushed 2026-10-31 10:50 BST): resume A from the verified step 11,798 / 22,780 checkpoint on GPU0; D44/E44 on GPU1. Budget 11 h; expected finish around 21:00 BST, subject to throughput. S03 has 13 completed runs; S04 should bring this to 16. Stage 6 results still cover S02; rerun on Kaggle CPU after S04 completes. Details: [HANDOFF.md](HANDOFF.md) → Next action.
+The Stage 6 bootstrap has completed on Kaggle CPU. No further GPU run is planned until downstream benchmarks are chosen.
+**Data and arms are final** (Stage 4 v4). **Update 2026-10-31:** Stage 5 session 04 completed: A42 reached 22,780 / 22,780 (held-out loss .7169), D44/E44 completed, and all 16 runs are valid. Stage 6 CPU kernel `habiburrahman118/bn-full-s06-eval-01` completed on Kaggle against S04; refreshed results are in `results/full_run/`. Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
 ## 0. Pilot (Iteration 03, 1,000 rows)
 
@@ -31,7 +31,7 @@ Estimated GPU time left: about 10 h for arm A, plus benchmarks; user confirmed *
 - [x] LoRA arms A, B, C, D, F on the pilot (Qwen2.5-0.5B-Instruct), held-out eval + paired bootstrap ([KAGGLE_EXPERIMENTS.md](KAGGLE_EXPERIMENTS.md)). Finding: no 400-row rule beats random; IFD is worse
 - [x] Judge backend benchmark (Stage 3a): vLLM fp16 TP2, Spearman 1.000 vs the pilot (2026-10-27)
 - [x] Judge EN vs BN rubric agreement on the pilot (notebook cell 23)
-- [ ] Judge vs **human** labels (100 rows: `scripts/annotate_human.py`, `analysis/validate_llm_judge.py`). Results are not in the repo; find or redo them. A reviewer will ask for this
+- [ ] Judge vs **human** labels (100 rows: `scripts/annotate_human.py`, `analysis/validate_llm_judge.py`). Labels are now at `human_annotation_100.jsonl`, but only 29 of the 100 rows are in the full-run pool, so the judge must score these rows (HANDOFF.md). A reviewer will ask for this
 
 ## 1. Full-run data pipeline (100K pool)
 
@@ -56,14 +56,14 @@ Estimated GPU time left: about 10 h for arm A, plus benchmarks; user confirmed *
 - [x] Stage 5 kernel (`kaggle/full_run/s05_lora/`: per-GPU queues, checkpoint/resume), smoke test passed (2026-10-30)
 - [x] Train B, C, D, E, F (seed 42) in one session, all complete, 419 min (2026-10-30)
 - [x] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison; seed spread ~.001 (2026-10-30)
-- [ ] Arm A (whole pool), full run (~20.6 h); resume path tested, exact match ← *S04 RUNNING from S03's step 11,798 checkpoint (2026-10-31 10:50 BST)*. D43, E43, F43, F44 complete; D44/E44 queued on S04's GPU1
+- [x] Arm A (whole pool), full run (~20.6 h); resume path tested, exact match ← *completed in S04 at 22,780 / 22,780 steps (2026-10-31)*. D43, E43, F43, D44, E44 complete; B–F now have 3 seeds
 
 ## 4. Evaluation (Stage 6)
 
 - [x] Held-out loss per model on the 470 held-out rows, written by Stage 5 (2026-10-30)
-- [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_bootstrap.py`, `results/full_run/`); seed 42 done, rerun after session 02 (2026-10-30)
-- [ ] **Decide on downstream benchmarks.** Held-out loss alone is weak evidence for a paper. Candidates: Bengali MMLU (already in decontamination), mHumanEval-bn, a small generation eval judged pairwise
-- [ ] Run the downstream benchmarks for every model
+- [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_kaggle.py`, `results/full_run/`); Kaggle CPU run `bn-full-s06-eval-01` completed against all 16 S04 runs (2026-10-31)
+- [ ] **Decide on downstream benchmarks.** Held-out loss alone is weak evidence for a paper. Recommended, waiting for the user's go: Bengali MMLU, BanglaRQA, and blind pairwise judging of generations on the held-out prompts. mHumanEval-bn is left out because it is a safety benchmark, not a test of instruction quality
+- [ ] Run the downstream benchmarks for every model ← *Stage 7 kernel ready and CPU-tested, not pushed (`kaggle/full_run/s07_benchmarks/`); pairwise judging is Stage 8*
 - [ ] Generation samples per arm (qualitative examples for the paper)
 
 ## 5. Analysis
@@ -95,4 +95,5 @@ Estimated GPU time left: about 10 h for arm A, plus benchmarks; user confirmed *
 | Base model for LoRA | **Qwen2.5-0.5B-Instruct** (2026-10-30) |
 | Kaggle account | stages 1–4: habiburrahman153; Stage 5+: **habiburrahman118** |
 | Arm A: full or compute-matched | **full** (2026-10-30; Claude took the standing recommendation, user can overrule) |
-| Downstream benchmarks | open |
+| Downstream benchmarks | recommended: MMLU-bn, BanglaRQA, pairwise judging; waiting for the user's go |
+| Pairwise judge (Stage 8) | open; recommended: a judge not used in selection, plus a human check on ~100 pairs |
