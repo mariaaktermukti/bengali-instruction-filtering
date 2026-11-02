@@ -19,3 +19,4 @@ scoring/results/
 .ipynb_checkpoints/
 analysis/*.csv
 outputs/
+.venv

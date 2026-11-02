@@ -1,0 +1,36 @@
+{
+  "smoke": false,
+  "mmlu_runs": 17,
+  "rqa_runs": 17,
+  "generation_runs": 7,
+  "runs": [
+    "base",
+    "arm_A_seed42",
+    "arm_B_seed42",
+    "arm_B_seed43",
+    "arm_B_seed44",
+    "arm_C_seed42",
+    "arm_C_seed43",
+    "arm_C_seed44",
+    "arm_D_seed42",
+    "arm_D_seed43",
+    "arm_D_seed44",
+    "arm_E_seed42",
+    "arm_E_seed43",
+    "arm_E_seed44",
+    "arm_F_seed42",
+    "arm_F_seed43",
+    "arm_F_seed44"
+  ],
+  "missing": [],
+  "worker_exit_codes": [
+    0,
+    0
+  ],
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "mmlu_revision": "325a01dc3e173cac1578df94120499aaca2e2504",
+  "rqa_revision": "f55f490265170e69073ae2d62c9c79ff405be6e6",
+  "gen_new_tokens": 1536,
+  "repetition_penalty": 1.0,
+  "total_minutes": 139.1
+}
