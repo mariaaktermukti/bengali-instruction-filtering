@@ -1,7 +1,7 @@
 {
   "smoke": false,
-  "mmlu_runs": 11,
-  "rqa_runs": 10,
+  "mmlu_runs": 17,
+  "rqa_runs": 17,
   "generation_runs": 7,
   "runs": [
     "base",
@@ -22,21 +22,7 @@
     "arm_F_seed43",
     "arm_F_seed44"
   ],
-  "missing": [
-    "arm_C_seed44/rqa",
-    "arm_D_seed43/mmlu",
-    "arm_D_seed43/rqa",
-    "arm_D_seed44/mmlu",
-    "arm_D_seed44/rqa",
-    "arm_E_seed43/mmlu",
-    "arm_E_seed43/rqa",
-    "arm_E_seed44/mmlu",
-    "arm_E_seed44/rqa",
-    "arm_F_seed43/mmlu",
-    "arm_F_seed43/rqa",
-    "arm_F_seed44/mmlu",
-    "arm_F_seed44/rqa"
-  ],
+  "missing": [],
   "worker_exit_codes": [
     0,
     0
@@ -46,5 +32,5 @@
   "rqa_revision": "f55f490265170e69073ae2d62c9c79ff405be6e6",
   "gen_new_tokens": 1536,
   "repetition_penalty": 1.0,
-  "total_minutes": 356.3
+  "total_minutes": 139.1
 }

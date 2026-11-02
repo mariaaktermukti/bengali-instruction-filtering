@@ -15,12 +15,15 @@ to training on the whole clean pool?
 | 1. Full-run data pipeline | 5 | 5 |
 | 2. Arm selection | 4 | 5 |
 | 3. Training | 6 | 6 |
-| 4. Evaluation | 3 | 5 |
+| 4. Evaluation | 4 | 5 |
 | 5. Analysis | 0 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **22** | **39** |
+| **All** | **23** | **39** |
 
-Status as of 2026-11-02: Stage 7 session 01 completed (356.3 min, INCOMPLETE — 13 tasks hit the 6 h budget). First benchmark results: MMLU accuracy base .2583, A .2624, **B .2584** (≈ base), C .2505 (−.008 vs B, CI excludes 0), D .2601, E .2337 (−.025, CI excludes 0), F .2376 (−.021, CI excludes 0). RQA F1 (seed-42 only, final CIs pending S02): base .207, A .183, B .150, C .174. Summary CSVs in `results/full_run/benchmarks/`. **Push Stage 7 session 02** to complete the missing D/E/F extra-seed and C_seed44/rqa tasks, then proceed to Stage 8 (blind pairwise judging).
+Status as of 2026-11-02: Stage 7 downstream benchmarks COMPLETE (S01 356.3 min + S02 139.1 min; all 17 MMLU, 17 RQA, and 7 generation runs complete, 0 missing). Key results:
+- **MMLU (14,042 questions, 3 seeds)**: Base .2583, A .2624, B .2584, C .2505 (−.0079 vs B), **D .2666 (+.0082 vs B, CI [+.0029, +.0134], p=.999, beats A)**, E .2370, F .2358.
+- **BanglaRQA (1,488 questions, 3 seeds)**: Base .2071 (highest overall). Fine-tuned models: A .1827, B .1504, **C .1757 (+.0253 vs B, CI [+.0175, +.0335], p=1.000, best 10K arm)**, D .1597 (+.0093), E .1681 (+.0177, C beats E by +.0076, demonstrating value of diversity τ=0.74), F .1531 (+.0027, CI crosses 0).
+- **Generations (470 prompts)**: 7 runs complete, 0 empty. Summary CSVs promoted to `results/full_run/benchmarks/`. Next is Stage 8 (blind pairwise judging of generations).
 
 **Data and arms are final** (Stage 4 v4). All 16 LoRA runs complete (Stage 5 S04). Stage 6 bootstrap complete (`results/full_run/`). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
@@ -62,7 +65,7 @@ Status as of 2026-11-02: Stage 7 session 01 completed (356.3 min, INCOMPLETE —
 - [x] Held-out loss per model on the 470 held-out rows, written by Stage 5 (2026-10-30)
 - [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_kaggle.py`, `results/full_run/`); Kaggle CPU run `bn-full-s06-eval-01` completed against all 16 S04 runs (2026-10-31)
 - [x] **Decide on downstream benchmarks.** Bengali MMLU, BanglaRQA, and blind pairwise judging of generations (2026-11-02)
-- [~] Run the downstream benchmarks for every model ← *Stage 7 S01 complete (INCOMPLETE: 13 tasks missing); **S02 needed** to finish D/E/F extra seeds and C_seed44/rqa. First results in `results/full_run/benchmarks/`*
+- [x] Run the downstream benchmarks for every model (Stage 7 S01 356 min + S02 139 min; all 17 MMLU, 17 RQA, 7 generation runs complete, 0 missing; results in `results/full_run/benchmarks/`) (2026-11-02)
 - [ ] Generation samples per arm (qualitative examples for the paper)
 
 ## 5. Analysis
@@ -94,5 +97,5 @@ Status as of 2026-11-02: Stage 7 session 01 completed (356.3 min, INCOMPLETE —
 | Base model for LoRA | **Qwen2.5-0.5B-Instruct** (2026-10-30) |
 | Kaggle account | stages 1–4: habiburrahman153; Stage 5+: **habiburrahman118** |
 | Arm A: full or compute-matched | **full** (2026-10-30; Claude took the standing recommendation, user can overrule) |
-| Downstream benchmarks | recommended: MMLU-bn, BanglaRQA, pairwise judging; waiting for the user's go |
+| Downstream benchmarks | **Bengali MMLU & BanglaRQA completed** (2026-11-02); Stage 8 pairwise judging next |
 | Pairwise judge (Stage 8) | open; recommended: a judge not used in selection, plus a human check on ~100 pairs |
