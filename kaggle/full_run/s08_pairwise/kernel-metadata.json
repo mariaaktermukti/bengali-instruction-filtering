@@ -1,0 +1,18 @@
+{
+  "id": "habiburrahman118/bn-full-s08-pairwise-01",
+  "title": "bn-full-s08-pairwise-01",
+  "code_file": "s08_pairwise.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [],
+  "kernel_sources": ["habiburrahman118/bn-full-s07-benchmarks-02"],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}
+
