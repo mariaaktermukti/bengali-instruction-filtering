@@ -15,15 +15,14 @@ to training on the whole clean pool?
 | 1. Full-run data pipeline | 5 | 5 |
 | 2. Arm selection | 4 | 5 |
 | 3. Training | 6 | 6 |
-| 4. Evaluation | 2 | 5 |
+| 4. Evaluation | 3 | 5 |
 | 5. Analysis | 0 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **21** | **39** |
+| **All** | **22** | **39** |
 
-Status as of 2026-10-31: the expensive data and training work is finished. **Arm A (the full 91,120-row pool) is best overall at .7169 held-out loss; among 10K arms, random B is best at .8126.** C is +.0254 vs B per-example, but only +.0014 token-weighted with a CI crossing zero. F is +.0133 vs B per-example. The seed spread remains small (~.001).
+Status as of 2026-11-02: Stage 7 session 01 completed (356.3 min, INCOMPLETE — 13 tasks hit the 6 h budget). First benchmark results: MMLU accuracy base .2583, A .2624, **B .2584** (≈ base), C .2505 (−.008 vs B, CI excludes 0), D .2601, E .2337 (−.025, CI excludes 0), F .2376 (−.021, CI excludes 0). RQA F1 (seed-42 only, final CIs pending S02): base .207, A .183, B .150, C .174. Summary CSVs in `results/full_run/benchmarks/`. **Push Stage 7 session 02** to complete the missing D/E/F extra-seed and C_seed44/rqa tasks, then proceed to Stage 8 (blind pairwise judging).
 
-The Stage 6 bootstrap has completed on Kaggle CPU. No further GPU run is planned until downstream benchmarks are chosen.
-**Data and arms are final** (Stage 4 v4). **Update 2026-10-31:** Stage 5 session 04 completed: A42 reached 22,780 / 22,780 (held-out loss .7169), D44/E44 completed, and all 16 runs are valid. Stage 6 CPU kernel `habiburrahman118/bn-full-s06-eval-01` completed on Kaggle against S04; refreshed results are in `results/full_run/`. Details: [HANDOFF.md](HANDOFF.md) → Next action.
+**Data and arms are final** (Stage 4 v4). All 16 LoRA runs complete (Stage 5 S04). Stage 6 bootstrap complete (`results/full_run/`). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
 ## 0. Pilot (Iteration 03, 1,000 rows)
 
@@ -62,8 +61,8 @@ The Stage 6 bootstrap has completed on Kaggle CPU. No further GPU run is planned
 
 - [x] Held-out loss per model on the 470 held-out rows, written by Stage 5 (2026-10-30)
 - [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_kaggle.py`, `results/full_run/`); Kaggle CPU run `bn-full-s06-eval-01` completed against all 16 S04 runs (2026-10-31)
-- [ ] **Decide on downstream benchmarks.** Held-out loss alone is weak evidence for a paper. Recommended, waiting for the user's go: Bengali MMLU, BanglaRQA, and blind pairwise judging of generations on the held-out prompts. mHumanEval-bn is left out because it is a safety benchmark, not a test of instruction quality
-- [ ] Run the downstream benchmarks for every model ← *Stage 7 kernel ready and CPU-tested, not pushed (`kaggle/full_run/s07_benchmarks/`); pairwise judging is Stage 8*
+- [x] **Decide on downstream benchmarks.** Bengali MMLU, BanglaRQA, and blind pairwise judging of generations (2026-11-02)
+- [~] Run the downstream benchmarks for every model ← *Stage 7 S01 complete (INCOMPLETE: 13 tasks missing); **S02 needed** to finish D/E/F extra seeds and C_seed44/rqa. First results in `results/full_run/benchmarks/`*
 - [ ] Generation samples per arm (qualitative examples for the paper)
 
 ## 5. Analysis
