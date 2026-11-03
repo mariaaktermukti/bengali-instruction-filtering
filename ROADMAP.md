@@ -15,15 +15,18 @@ to training on the whole clean pool?
 | 1. Full-run data pipeline | 5 | 5 |
 | 2. Arm selection | 4 | 5 |
 | 3. Training | 6 | 6 |
-| 4. Evaluation | 4 | 5 |
+| 4. Evaluation | 4 | 6 |
 | 5. Analysis | 0 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **23** | **39** |
+| **All** | **23** | **40** |
 
-Status as of 2026-11-03: Stage 7 downstream benchmarks COMPLETE (all 17 MMLU, 17 RQA, and 7 generation runs complete, 0 missing). Stage 8 pairwise judge v2 (`habiburrahman118/bn-full-s08-pairwise-01`) is **RUNNING** on Kaggle 2×T4 (re-pushed 2026-11-03 14:07 BST with `logprobs=20` after v1 hit vLLM's max_logprobs limit). Key Stage 7 results:
+Status as of 2026-11-03: Stage 7 downstream benchmarks COMPLETE (all 17 MMLU, 17 RQA, and 7 generation runs complete, 0 missing). Stage 8 pairwise judge S01 COMPLETE (336 min, 8,500 / 19,740 scored at ~1,560 comp/h). Initial pairwise results:
+- **Vs Arm B (random 10K)**: A .6987, D .4842, Base .4427, C .3665, E .3449, F .3081.
+- **Head-to-head**: C beats E (.7017, confirming value of τ=0.74 diversity), D beats E (.7685) and F (.7446), C beats F (.6379), A dominates all (.60–.79).
+- **Next**: launch Session 02 (`habiburrahman118/bn-full-s08-pairwise-02`) with S01 attached to score remaining 11,240 comparisons (~7.2 h). Key Stage 7 results:
 - **MMLU (14,042 questions, 3 seeds)**: Base .2583, A .2624, B .2584, C .2505 (−.0079 vs B), **D .2666 (+.0082 vs B, CI [+.0029, +.0134], p=.999, beats A)**, E .2370, F .2358.
 - **BanglaRQA (1,488 questions, 3 seeds)**: Base .2071 (highest overall). Fine-tuned models: A .1827, B .1504, **C .1757 (+.0253 vs B, CI [+.0175, +.0335], p=1.000, best 10K arm)**, D .1597 (+.0093), E .1681 (+.0177, C beats E by +.0076, demonstrating value of diversity τ=0.74), F .1531 (+.0027, CI crosses 0).
-- **Generations (470 prompts)**: 7 runs complete, 0 empty. Summary CSVs promoted to `results/full_run/benchmarks/`. Next: await Stage 8 blind pairwise judging results (19,740 comparisons across 470 prompts, 21 model pairs × 2 orders).
+- **Generations (470 prompts)**: 7 runs complete, 0 empty. Summary CSVs promoted to `results/full_run/benchmarks/`.
 
 **Data and arms are final** (Stage 4 v4). All 16 LoRA runs complete (Stage 5 S04). Stage 6 bootstrap complete (`results/full_run/`). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
@@ -60,12 +63,13 @@ Status as of 2026-11-03: Stage 7 downstream benchmarks COMPLETE (all 17 MMLU, 17
 - [x] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison; seed spread ~.001 (2026-10-30)
 - [x] Arm A (whole pool), full run (~20.6 h); resume path tested, exact match ← *completed in S04 at 22,780 / 22,780 steps (2026-10-31)*. D43, E43, F43, D44, E44 complete; B–F now have 3 seeds
 
-## 4. Evaluation (Stage 6)
+## 4. Evaluation (Stages 6–8)
 
 - [x] Held-out loss per model on the 470 held-out rows, written by Stage 5 (2026-10-30)
 - [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_kaggle.py`, `results/full_run/`); Kaggle CPU run `bn-full-s06-eval-01` completed against all 16 S04 runs (2026-10-31)
 - [x] **Decide on downstream benchmarks.** Bengali MMLU, BanglaRQA, and blind pairwise judging of generations (2026-11-02)
 - [x] Run the downstream benchmarks for every model (Stage 7 S01 356 min + S02 139 min; all 17 MMLU, 17 RQA, 7 generation runs complete, 0 missing; results in `results/full_run/benchmarks/`) (2026-11-02)
+- [~] Blind pairwise judging of generations across all 7 models (Stage 8, 19,740 comparisons: S01 done 8,500/19,740 in 336 min; S02 needed for remaining 11,240) (2026-11-03)
 - [ ] Generation samples per arm (qualitative examples for the paper)
 
 ## 5. Analysis
@@ -97,5 +101,5 @@ Status as of 2026-11-03: Stage 7 downstream benchmarks COMPLETE (all 17 MMLU, 17
 | Base model for LoRA | **Qwen2.5-0.5B-Instruct** (2026-10-30) |
 | Kaggle account | stages 1–4: habiburrahman153; Stage 5+: **habiburrahman118** |
 | Arm A: full or compute-matched | **full** (2026-10-30; Claude took the standing recommendation, user can overrule) |
-| Downstream benchmarks | **Bengali MMLU & BanglaRQA completed** (2026-11-02); Stage 8 pairwise judging next |
-| Pairwise judge (Stage 8) | open; recommended: a judge not used in selection, plus a human check on ~100 pairs |
+| Downstream benchmarks | **Bengali MMLU & BanglaRQA completed** (2026-11-02) |
+| Pairwise judge (Stage 8) | **DECIDED 2026-11-02: Qwen2.5-7B-Instruct fp16 vLLM TP=2** (S01 8,500/19,740 done, S02 ready) |

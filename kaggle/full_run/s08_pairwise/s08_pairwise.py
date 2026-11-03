@@ -27,7 +27,7 @@ from collections import defaultdict
 INPUT_ROOT = os.environ.get("S08_INPUT", "/kaggle/input")
 OUT = Path(os.environ.get("S08_OUT", "/kaggle/working/bangla_filtering/full/pairwise"))
 SMOKE = os.environ.get("S08_SMOKE") == "1"          # 2 pairs x 5 prompts: tests the code cheaply
-TIME_BUDGET_H = float(os.environ.get("TIME_BUDGET_H", "5.5"))  # stop before the 6h session limit
+TIME_BUDGET_H = float(os.environ.get("TIME_BUDGET_H", "8.0"))  # 8h budget allows finishing remaining 11.2K rows in one session
 MIN_START_MIN = 10                                   # do not start a new chunk with less than this left
 
 JUDGE_MODEL = "Qwen/Qwen2.5-7B-Instruct"

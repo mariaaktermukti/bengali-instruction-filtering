@@ -33,7 +33,7 @@ Live status and the next command to run: [HANDOFF.md](../../HANDOFF.md).
 | 5 | `habiburrahman118/bn-full-s05-lora-NN` | 2×T4 | LoRA (Qwen2.5-0.5B-Instruct), a queue of runs per GPU; arms from the private dataset `habiburrahman118/bn-full-arms`; per-example held-out losses | 1.9–2.9 h per 10K-row arm; B–F in one ~7 h session | done: sessions 01–04 (16 runs complete, arm A finished at 22,780 steps) |
 | 6 | `kaggle/full_run/s06_eval/s06_bootstrap.py` | CPU, local | paired bootstrap on the held-out losses Stage 5 wrote (470 rows), per-example and token-weighted | seconds | done: all 16 runs evaluated (`results/full_run/`) |
 | 7 | `habiburrahman118/bn-full-s07-benchmarks-NN` | 2×T4 | Bengali MMLU and BanglaRQA on base + 16 adapters; greedy generations on the 470 held-out prompts for base + seed 42 of each arm | not measured on T4; budget 6 h | done: S01 + S02 (all 17 MMLU, 17 RQA, 7 gen runs complete, 0 missing) |
-| 8 | `habiburrahman118/bn-full-s08-pairwise-NN` | 2×T4 | Blind pairwise judging of 470 held-out generations (21 pairs × 2 orders = 42 comp/prompt, 19,740 total); Qwen2.5-7B vLLM TP=2 | ~4.5–5.5 h | S01 v2 RUNNING (pushed 2026-11-03 14:07 BST with `logprobs=20`) |
+| 8 | `habiburrahman118/bn-full-s08-pairwise-NN` | 2×T4 | Blind pairwise judging of 470 held-out generations (21 pairs × 2 orders = 42 comp/prompt, 19,740 total); Qwen2.5-7B vLLM TP=2 | ~12–14 h total (2 sessions) | S01 done (336 min, 8,500/19,740 scored); S02 ready for remaining 11,240 |
 
 Estimated GPU total: about 60–90 h, i.e. 2–3 weeks of Kaggle quota. The judge is the largest cost.
 
