@@ -20,10 +20,10 @@ to training on the whole clean pool?
 | 6. Writing | 0 | 8 |
 | **All** | **23** | **39** |
 
-Status as of 2026-11-02: Stage 7 downstream benchmarks COMPLETE (S01 356.3 min + S02 139.1 min; all 17 MMLU, 17 RQA, and 7 generation runs complete, 0 missing). Key results:
+Status as of 2026-11-03: Stage 7 downstream benchmarks COMPLETE (all 17 MMLU, 17 RQA, and 7 generation runs complete, 0 missing). Stage 8 pairwise judge v2 (`habiburrahman118/bn-full-s08-pairwise-01`) is **RUNNING** on Kaggle 2×T4 (re-pushed 2026-11-03 14:07 BST with `logprobs=20` after v1 hit vLLM's max_logprobs limit). Key Stage 7 results:
 - **MMLU (14,042 questions, 3 seeds)**: Base .2583, A .2624, B .2584, C .2505 (−.0079 vs B), **D .2666 (+.0082 vs B, CI [+.0029, +.0134], p=.999, beats A)**, E .2370, F .2358.
 - **BanglaRQA (1,488 questions, 3 seeds)**: Base .2071 (highest overall). Fine-tuned models: A .1827, B .1504, **C .1757 (+.0253 vs B, CI [+.0175, +.0335], p=1.000, best 10K arm)**, D .1597 (+.0093), E .1681 (+.0177, C beats E by +.0076, demonstrating value of diversity τ=0.74), F .1531 (+.0027, CI crosses 0).
-- **Generations (470 prompts)**: 7 runs complete, 0 empty. Summary CSVs promoted to `results/full_run/benchmarks/`. Stage 8 blind pairwise judging is now **RUNNING / QUEUED** on Kaggle (`habiburrahman118/bn-full-s08-pairwise-01`, 19,740 comparisons across 470 prompts, 21 model pairs × 2 orders).
+- **Generations (470 prompts)**: 7 runs complete, 0 empty. Summary CSVs promoted to `results/full_run/benchmarks/`. Next: await Stage 8 blind pairwise judging results (19,740 comparisons across 470 prompts, 21 model pairs × 2 orders).
 
 **Data and arms are final** (Stage 4 v4). All 16 LoRA runs complete (Stage 5 S04). Stage 6 bootstrap complete (`results/full_run/`). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 

@@ -247,8 +247,8 @@ def worker(deadline):
                                                                      (" 2", "2"), ("2", "2"),
                                                                      (" T", "T"), ("T", "T"),
                                                                      (" t", "T"), ("t", "T")]}
-    # SamplingParams: 1 token, get logprobs for top 50 to catch all verdict tokens
-    params = SamplingParams(max_tokens=1, temperature=0.0, logprobs=50)
+    # SamplingParams: 1 token, get logprobs for top 20 (vLLM max allowed without custom engine flags)
+    params = SamplingParams(max_tokens=1, temperature=0.0, logprobs=20)
 
     chunk_estimate = CHUNK / 3500 * 3600             # estimated seconds per chunk at 3500 comp/h
 
