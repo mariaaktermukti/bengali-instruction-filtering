@@ -16,7 +16,7 @@ Update the **Status** table and **Next action** after every step, and add a line
 | 5 LoRA per arm (2×T4) | `habiburrahman118/bn-full-s05-lora-NN` | **sessions 01–04 DONE** (419, 318, 640, 628 min): **16 runs complete**. S04 finished A42 at 22,780 / 22,780 and D44/E44; output in `outputs/full/s05_04/` | `kaggle/full_run/s05_lora/`. Qwen2.5-0.5B-Instruct, pilot hyper-parameters, per-GPU queues, checkpoint every 250 steps, stop on a time budget, resume by attaching the previous session. S04 A held-out loss **0.7169**; available seed means before Stage 6 averaging: B .8126, C .8380, D .8572, E .8661, F .8260. All 16 runs have 470 held-out rows and finite losses; peak GPU 7.61 GiB |
 | 6 eval (CPU, Kaggle) | `habiburrahman118/bn-full-s06-eval-01` | **DONE** (2026-10-31, all 16 runs) | `results/full_run/`. Per-example: base .9779, **A .7169**, B .8126, F .8260, C .8380, D .8572, E .8661. Versus B: A −.0957 [−.1006, −.0911], F +.0133 [.0101, .0165], C +.0254 [.0189, .0323]. Token-weighted: A .7188, B .8172, C .8186 (difference +.0014, CI crosses 0), E .8255, D .8307, F .8327 |
 | 7 benchmarks (2×T4) | `habiburrahman118/bn-full-s07-benchmarks-01`, `…-02` | **DONE** (S01 356 min, S02 139 min; 17 runs, 0 missing) | All 17 MMLU runs, 17 RQA runs, and 7 generation runs complete (workers [0, 0], no NaN, peak GPU 5.24 GiB). Output in `outputs/full/s07_02/` and promoted to `results/full_run/benchmarks/`. MMLU acc: base .2583, A .2624 (+.0040 vs B), B .2584, C .2505 (−.0079), **D .2666 (+.0082, p=.999, beats A)**, E .2370 (−.0213), F .2358 (−.0226). RQA F1: base .2071, A .1827 (+.0323 vs B), B .1504, **C .1757 (+.0253 vs B, p=1.0, best 10K arm)**, D .1597 (+.0093), E .1681 (+.0177, C beats E by +.0076), F .1531 (+.0027, CI crosses 0). Gen: 0 empty, mean len 1,108–1,388 tok |
-| 8 pairwise judge (2×T4) | `habiburrahman118/bn-full-s08-pairwise-01`, `…-02` | **S01 PARTIAL: 8,500 / 19,740 scored (336 min)** | `kaggle/full_run/s08_pairwise/`. Clean stop at 5.5 h budget (~1,560 comp/h). Output in `outputs/full/s08_01/`. Win rates vs B: A .6987, D .4842, base .4427, C .3665, E .3449, F .3081. Head-to-head: C beats E (.7017), D beats E (.7685) and F (.7446), C beats F (.6379), A dominates all (.60–.79). Session 02 needed for remaining 11,240 rows. |
+| 8 pairwise judge (2×T4) | `habiburrahman118/bn-full-s08-pairwise-01`, `…-02` | **DONE** (S01 336 min, S02 443 min; **19,740 / 19,740 scored, 0 missing, complete**) | `kaggle/full_run/s08_pairwise/`. Qwen2.5-7B-Instruct fp16 vLLM TP=2 on 2×T4. Scored all 19,740 comparisons across 470 prompts (21 model pairs × 2 orders). Outputs downloaded to `outputs/full/s08_02/` and promoted to `results/full_run/pairwise/`. Win rates vs B: A .7032, Base .4729, D .4638, C .3761, E .3484, F .3207. Head-to-head: C beats E (.6170, p=1.0), D beats E (.7585, p=1.0) and F (.7633, p=1.0), C beats F (.6612, p=1.0), C vs D tied (.4947 vs .5053, p=.339), A dominates all (.58–.79) |
 
 Stage 1 caveat: the filter-bias check flagged **code (20.7% dropped, mostly `language`: 3,038 rows)** and
 **mcq_classification (21.0%, mostly `translationese`: 366 rows)**. The pilot showed the same pattern (code 19%).
@@ -43,17 +43,29 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
    - **BanglaRQA (1,488 questions, 3 seeds)**: Base .2071 (highest overall). Fine-tuned models: A .1827 (+.0323 vs B), B .1504, **C .1757 (+.0253 vs B, CI [+.0175, +.0335], p=1.000)**, D .1597 (+.0093), E .1681 (+.0177), F .1531 (+.0027, CI crosses 0). DEITA selection (C) is significantly the best 10K arm, recovering 78% of the gap to full-pool A. C beats E (+.0076 F1), confirming the benefit of diversity filtering τ=0.74.
    - **Generations (470 prompts, base + seed 42 per arm)**: 0 empty files across all 7 runs. Mean tokens 1,108 (A) to 1,388 (E). Ready for Stage 8 pairwise evaluation.
 6. **Stage 8 (blind pairwise judging of generations)**:
-   - **S01 complete** (336.0 min = 5.6 h): scored **8,500 / 19,740 comparisons** (~1,560 comp/h). Stopped cleanly at the 5.5 h budget; 0 NaN, 0 errors. Downloaded to `outputs/full/s08_01/`.
-   - **Partial win-rate findings (8,500 comparisons, position-bias corrected)**:
-     - **Vs Arm B (random 10K)**: **A .6987** (~70% win rate), **D .4842** (closest 10K arm to B), Base .4427, **C .3665**, E .3449, F .3081.
-     - **Head-to-head pairs**:
-       - **C beats E decisively (.7017)**: 70.2% win rate confirms diversity filtering (τ=0.74) strongly outperforms quality×complexity without diversity.
-       - **D beats E (.7685) and F (.7446)**: pure quality (D) beats un-diversified c×q and IFD.
-       - **C beats F (.6379)**: DEITA selection beats IFD by +13.8%.
-       - **A dominates all**: vs base .6000, vs B .6987, vs C .7759, vs D .6006, vs E .7722, vs F .7882.
-   - **Next action**: launch Session 02 (`habiburrahman118/bn-full-s08-pairwise-02`) with `bn-full-s08-pairwise-01` attached as a kernel source to score the remaining 11,240 comparisons. At ~1,560 comp/h, 11,240 comparisons require ~7.2 h. Set time budget to 8.0 h so S02 finishes the entire benchmark in one session.
-8. Judge vs human (ROADMAP phase 0): `human_annotation_100.jsonl` is at the repo root, but only **29 of its 100 rows** are in the pool with the same response, so the full-run scores do not cover it. Score all 100 rows with the Stage 3 judge whenever vLLM is next loaded (minutes, plus ~9 min startup). `analysis/validate_llm_judge.py` reads paths that no longer exist (`data/pilot/`, `scoring/results/`), so update them.
-9. Report in the paper: token totals differ per arm (C +27%, F −10% vs B), so compare per token as well as per row; code is under-selected by c × q.
+   - **S01 complete** (336.0 min = 5.6 h): scored 8,500 / 19,740 comparisons at ~1,560 comp/h before clean budget stop.
+   - **S02 complete** (443.3 min = 7.4 h): scored remaining 11,240 comparisons to reach **19,740 / 19,740 scored (100% complete, 0 missing)**. Downloaded to `outputs/full/s08_02/`, promoted to `results/full_run/pairwise/`.
+   - **Final win-rate findings (19,740 comparisons across 470 prompts, position-bias corrected, 95% bootstrap CI)**:
+     - **Vs Arm B (random 10K)**: **A .7032** [.675, .731] (A strongly beats B), Base .4729 [.449, .498], **D .4638** [.436, .492], **C .3761** [.352, .406], E .3484 [.321, .377], F .3207 [.294, .349].
+     - **Key head-to-head pairs**:
+       - **C beats E (.6170, 95% CI [.590, .644], p=1.000)**: diversity filtering (τ=0.74) decisively outperforms raw complexity × quality without diversity (+23.4% win margin).
+       - **C beats F (.6612, 95% CI [.635, .687], p=1.000)**: DEITA selection decisively beats IFD (Cherry-LLM).
+       - **D beats E (.7585, p=1.000) and F (.7633, p=1.000)**: pure quality strongly outperforms un-diversified c×q and IFD.
+       - **C vs D tied (.4947 vs .5053, p=.339)**: DEITA and quality-only perform equally in head-to-head generation.
+       - **A dominates all (.58–.79)**: whole-pool training consistently outperforms 10K subsets.
+       - **Domain filter-bias effect**: on 70 code prompts, F (21.2% code) achieves .4643 vs B, while C (3.0% code) drops to .3143 and E (1.4% code) to .2071, confirming filter bias on code directly impacts downstream generation.
+   - **Stage 8 is COMPLETE**. All full-run experiment stages (1–8) are now finished!
+7. **Phase 4 & Phase 5 Analyses COMPLETE (2026-11-05)**:
+   - Generated qualitative generation comparison across 7 arms on representative prompts (`results/full_run/qualitative_samples.md`).
+   - Produced master synthesis results table uniting Held-out Loss, Token-weighted Loss, Bengali MMLU, BanglaRQA, and Pairwise Win Rates (`results/full_run/main_results_table.csv`, `.md`).
+   - Produced token efficiency analysis (`results/full_run/token_efficiency.csv`).
+   - Produced diversity ablation analysis demonstrating that $\tau=0.74$ beats raw score filtering $E$ across every single evaluation metric (`results/full_run/diversity_ablation.csv`).
+   - Produced domain-mix & filter bias analysis (`results/full_run/domain_filter_bias.csv`).
+8. **Next action (Phase 6 Writing)**:
+   - Target venue selection and manuscript drafting (outline, methodology, experimental results, and limitations).
+   - Generate paper figures/plots (e.g. diversity sweep, win rate matrix, token efficiency).
+9. Judge vs human (ROADMAP phase 0): `human_annotation_100.jsonl` is at the repo root, but only **29 of its 100 rows** are in the pool with the same response, so the full-run scores do not cover it. Score all 100 rows with the Stage 3 judge whenever vLLM is next loaded (minutes, plus ~9 min startup). `analysis/validate_llm_judge.py` reads paths that no longer exist (`data/pilot/`, `scoring/results/`), so update them.
+10. Report in the paper: token totals differ per arm (C +27%, F −10% vs B), so compare per token as well as per row; code is under-selected by c × q.
 
 ## Decisions
 
@@ -84,6 +96,7 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
 
 ## Log
 
+- 2026-11-05 01:15 BST: Stage 8 kernel `bn-full-s08-pairwise-02` COMPLETE (443.3 min = 7.4 h). Downloaded to `outputs/full/s08_02/`. All 19,740 / 19,740 comparisons scored (0 missing, complete=true). Promoted results to `results/full_run/pairwise/`. Computed 95% bootstrap CIs and domain breakdown via `analysis/analyze_pairwise.py`. Findings: A dominates all (.7032 vs B, .58–.79 overall); among 10K arms, D is closest to B (.4638); C beats E (.6170, p=1.000, confirming diversity τ=0.74 value); C beats F (.6612, p=1.000, DEITA beats IFD); D beats E (.7585) and F (.7633); C and D tie (.4947 vs .5053, p=.339). Domain analysis confirms under-selection of code hurts code generation (F with 21.2% code scored .4643 vs B; C with 3.0% code scored .3143; E with 1.4% code scored .2071). All experimental stages (1–8) are now complete.
 - 2026-11-03 19:57 BST: Stage 8 kernel `bn-full-s08-pairwise-01` v2 COMPLETE (336.0 min = 5.6 h). Downloaded to `outputs/full/s08_01/`. Scored 8,500 / 19,740 comparisons at ~1,560 comp/h before clean budget stop (0 errors, 0 NaN). Win rates vs B: A .6987, D .4842, Base .4427, C .3665, E .3449, F .3081. Head-to-head highlights: C beats E (.7017, +20.2%), D beats E (.7685) and F (.7446), C beats F (.6379), A dominates all (.60–.79). Missing: 11,240 comparisons; push session 02 with S01 attached.
 - 2026-11-03 14:07 BST: repushed Stage 8 kernel `bn-full-s08-pairwise-01` v2 with the `logprobs=20` fix. Status: RUNNING on Kaggle 2×T4.
 - 2026-11-03 14:00 BST: checked Stage 8 kernel `bn-full-s08-pairwise-01` v1 on Kaggle. It exited COMPLETE after 15.9 min, but scored 0 / 19,740 comparisons (`pairwise_summary.json` downloaded to `outputs/full/s08_01/`). Worker logs showed repeated `vllm.exceptions.VLLMValidationError: Requested sample logprobs of 50, which is greater than max allowed: 20` at `llm.generate()`. Fixed in `kaggle/full_run/s08_pairwise/s08_pairwise.py` by reducing `logprobs` to 20 (more than enough for the 8 verdict tokens {" 1", "1", " 2", "2", " T", "T", " t", "t"}). Ready for re-run.

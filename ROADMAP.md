@@ -15,18 +15,19 @@ to training on the whole clean pool?
 | 1. Full-run data pipeline | 5 | 5 |
 | 2. Arm selection | 4 | 5 |
 | 3. Training | 6 | 6 |
-| 4. Evaluation | 4 | 6 |
-| 5. Analysis | 0 | 5 |
+| 4. Evaluation | 6 | 6 |
+| 5. Analysis | 5 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **23** | **40** |
+| **All** | **30** | **40** |
 
-Status as of 2026-11-03: Stage 7 downstream benchmarks COMPLETE (all 17 MMLU, 17 RQA, and 7 generation runs complete, 0 missing). Stage 8 pairwise judge S01 COMPLETE (336 min, 8,500 / 19,740 scored at ~1,560 comp/h). Initial pairwise results:
-- **Vs Arm B (random 10K)**: A .6987, D .4842, Base .4427, C .3665, E .3449, F .3081.
-- **Head-to-head**: C beats E (.7017, confirming value of τ=0.74 diversity), D beats E (.7685) and F (.7446), C beats F (.6379), A dominates all (.60–.79).
-- **Next**: launch Session 02 (`habiburrahman118/bn-full-s08-pairwise-02`) with S01 attached to score remaining 11,240 comparisons (~7.2 h). Key Stage 7 results:
-- **MMLU (14,042 questions, 3 seeds)**: Base .2583, A .2624, B .2584, C .2505 (−.0079 vs B), **D .2666 (+.0082 vs B, CI [+.0029, +.0134], p=.999, beats A)**, E .2370, F .2358.
-- **BanglaRQA (1,488 questions, 3 seeds)**: Base .2071 (highest overall). Fine-tuned models: A .1827, B .1504, **C .1757 (+.0253 vs B, CI [+.0175, +.0335], p=1.000, best 10K arm)**, D .1597 (+.0093), E .1681 (+.0177, C beats E by +.0076, demonstrating value of diversity τ=0.74), F .1531 (+.0027, CI crosses 0).
-- **Generations (470 prompts)**: 7 runs complete, 0 empty. Summary CSVs promoted to `results/full_run/benchmarks/`.
+Status as of 2026-11-05: **All experimental stages (1–8) and Phase 5 Analyses COMPLETE**.
+- **Phase 4 Evaluation is 100% complete (6/6)**: Held-out loss, bootstrap comparisons, Bengali MMLU, BanglaRQA, pairwise judging (19,740 comparisons), and qualitative generation samples (`results/full_run/qualitative_samples.md`).
+- **Phase 5 Analysis is 100% complete (5/5)**:
+  - Master results synthesis table (`results/full_run/main_results_table.csv`, `.md`).
+  - Token-efficiency analysis (`results/full_run/token_efficiency.csv`).
+  - Diversity ablation ($\tau=0.74$ vs no diversity, `results/full_run/diversity_ablation.csv`).
+  - Domain-mix & filter bias analysis (`results/full_run/domain_filter_bias.csv`).
+- **Next**: Phase 6 Writing (outline, paper sections, and LaTeX manuscript). Details in [HANDOFF.md](HANDOFF.md).
 
 **Data and arms are final** (Stage 4 v4). All 16 LoRA runs complete (Stage 5 S04). Stage 6 bootstrap complete (`results/full_run/`). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
@@ -69,16 +70,16 @@ Status as of 2026-11-03: Stage 7 downstream benchmarks COMPLETE (all 17 MMLU, 17
 - [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_kaggle.py`, `results/full_run/`); Kaggle CPU run `bn-full-s06-eval-01` completed against all 16 S04 runs (2026-10-31)
 - [x] **Decide on downstream benchmarks.** Bengali MMLU, BanglaRQA, and blind pairwise judging of generations (2026-11-02)
 - [x] Run the downstream benchmarks for every model (Stage 7 S01 356 min + S02 139 min; all 17 MMLU, 17 RQA, 7 generation runs complete, 0 missing; results in `results/full_run/benchmarks/`) (2026-11-02)
-- [~] Blind pairwise judging of generations across all 7 models (Stage 8, 19,740 comparisons: S01 done 8,500/19,740 in 336 min; S02 needed for remaining 11,240) (2026-11-03)
-- [ ] Generation samples per arm (qualitative examples for the paper)
+- [x] Blind pairwise judging of generations across all 7 models (Stage 8, 19,740 comparisons: S01 336 min + S02 443 min, 100% complete, 0 missing; results in `results/full_run/pairwise/`) (2026-11-05)
+- [x] Generation samples per arm (qualitative examples for the paper) (`results/full_run/qualitative_samples.md`) (2026-11-05)
 
 ## 5. Analysis
 
-- [ ] Main results table: arm × (held-out loss, benchmarks), with CIs
-- [ ] Per-token view: results vs training tokens (arms differ by up to 26% in tokens)
-- [ ] Domain-mix analysis: does under-selecting code hurt code-related eval?
-- [ ] τ / diversity ablation: C vs E at the chosen τ (and the sweep table)
-- [ ] Filter-bias appendix: Stage 1 drops 20.7% of code rows (code outside fences counts as English)
+- [x] Main results table: arm × (held-out loss, benchmarks), with CIs (`results/full_run/main_results_table.csv`, `.md`) (2026-11-05)
+- [x] Per-token view: results vs training tokens (arms differ by up to 26% in tokens) (`results/full_run/token_efficiency.csv`) (2026-11-05)
+- [x] Domain-mix analysis: does under-selecting code hurt code-related eval? (`results/full_run/domain_filter_bias.csv`) (2026-11-05)
+- [x] τ / diversity ablation: C vs E at the chosen τ (and the sweep table) (`results/full_run/diversity_ablation.csv`) (2026-11-05)
+- [x] Filter-bias appendix: Stage 1 drops 20.7% of code rows (code outside fences counts as English) (`results/full_run/domain_filter_bias.csv`) (2026-11-05)
 
 ## 6. Writing
 
