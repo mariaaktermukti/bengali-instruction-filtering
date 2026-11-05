@@ -55,6 +55,13 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
        - **A dominates all (.58–.79)**: whole-pool training consistently outperforms 10K subsets.
        - **Domain filter-bias effect**: on 70 code prompts, F (21.2% code) achieves .4643 vs B, while C (3.0% code) drops to .3143 and E (1.4% code) to .2071, confirming filter bias on code directly impacts downstream generation.
    - **Stage 8 is COMPLETE**. All full-run experiment stages (1–8) are now finished!
+   - **Stage 9 (judge validation) is COMPLETE** (2026-11-05, kernel `habiburrahman153/bn-full-s09-judge-human-02`, 20.9 min):
+     - **Judge vs human (100 rows)**: the 100 human labels use a 1-5 scale and the judge a 1-6 scale, so the judge is mapped with `1 + (judge − 1)·4/5` and binned. **Complexity: Spearman .543** (p<.0001), exact 40%, within-1 95%, κ_quad .316 - a usable agreement. **Quality: Spearman .078** (p=.44), exact 14%, within-1 54%, κ_quad .033 - **no usable agreement**. The judge also has a **ceiling** (binned quality: 70 rows at 4, 23 at 5, 7 at 3, 0 below 3) while the human labels span 1-5.
+     - **The quality failure is not model-specific**: the independent Llama-3.1-8B rater scores the same rows and also fails (rho −.084 vs human quality; it does agree on complexity, rho .525). Both judges give the same wrong answers on rows the human marked 1 (e.g. id 55/83/20: human 1, judge ~5.0-5.3), i.e. both models rate fluent, well-formed Bengali as good when the content is wrong. So the human labels capture **factual correctness** that neither rubric operationalises.
+     - **Consequence for the paper**: the q score must be described as a *ranking signal that correlates with human complexity but not with human quality*, and the limitation section must say the judge is reliable for c and unreliable for q. This also weakens the arm-D (quality-only) result: D was selected on exactly the dimension the judge cannot verify.
+     - **Blind spot-check (non-circular)**: the 100 sheet items (50 C + 50 B, arm hidden) were rated by the **independent** Llama-3.1-8B on 1-5 usefulness, because rating them with the Qwen judge would be circular (arm C was selected to maximise the judge's c x q). **C beats B by +0.070** (95% CI [+.009, +.133], p(C better) = .990). The circular Qwen view shows a much bigger gap (c x q 23.25 for C vs 17.61 for B) - report both, the independent one as the headline.
+     - The human half of the spot-check (a person filling `results/full_run/spotcheck_ratings.csv`) is still open and optional: the independent-rater result already answers the question.
+     - Reproduce with `analysis/validate_llm_judge.py`, `analysis/join_spotcheck.py`, `analysis/diagnose_judge_agreement.py`.
 7. **Phase 4 & Phase 5 Analyses COMPLETE (2026-11-05)**:
    - Generated qualitative generation comparison across 7 arms on representative prompts (`results/full_run/qualitative_samples.md`).
    - Produced master synthesis results table uniting Held-out Loss, Token-weighted Loss, Bengali MMLU, BanglaRQA, and Pairwise Win Rates (`results/full_run/main_results_table.csv`, `.md`).
@@ -64,15 +71,15 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
 8. **Next action (Phase 6 Writing)**:
    - Target venue selection and manuscript drafting (outline, methodology, experimental results, and limitations).
    - Generate paper figures/plots (e.g. diversity sweep, win rate matrix, token efficiency).
-9. Judge vs human (ROADMAP phase 0): `human_annotation_100.jsonl` is at the repo root, but only **29 of its 100 rows** are in the pool with the same response, so the full-run scores do not cover it. Score all 100 rows with the Stage 3 judge whenever vLLM is next loaded (minutes, plus ~9 min startup). `analysis/validate_llm_judge.py` reads paths that no longer exist (`data/pilot/`, `scoring/results/`), so update them.
-10. Report in the paper: token totals differ per arm (C +27%, F −10% vs B), so compare per token as well as per row; code is under-selected by c × q.
+9. ~~Judge vs human (ROADMAP phase 0)~~ **DONE in Stage 9** (2026-11-05): `analysis/validate_llm_judge.py` was rewritten for the new paths (it no longer reads `data/pilot/` or `scoring/results/`) and reads `human_annotation_100.jsonl` + `results/full_run/judge_human_100.jsonl`. The 71 rows outside the pool were scored fresh by the Stage 9 kernel with the identical rubric; `analysis/match_human_to_pool.py` documents the 29/100 overlap and how it was found.
+10. Report in the paper: token totals differ per arm (C +27%, F −10% vs B), so compare per token as well as per row; code is under-selected by c × q. **Note the tokenizer**: Stage 1 counted with the Llama-3.2-1B tokenizer (A 111.5M) but Stage 5 tokenised with Qwen2.5-0.5B (A 102.4M), ~9% lower. `results/full_run/token_efficiency.csv` uses the Llama counts; state which tokenizer each table uses.
 
 ## Decisions
 
 - Arm size **K = 10,000** for arms B–F (user, 2026-10-26). Set `SUBSET_SIZE = 10_000` in Stage 4.
 - **τ = 0.74** (2026-10-30): the notebook's 0.90 left C 91.5% identical to E; 0.74 ≈ pool NN-sim p25, C∩E 58%.
 - **Base model for LoRA: Qwen2.5-0.5B-Instruct** (user, 2026-10-30): ~2.4 h per 10K arm vs ~5–6 h for Llama-3.2-1B; IFD recomputed with it (Stage 2b) so arm F matches.
-- **Kaggle accounts** (2026-10-30): stages 1–4 on `habiburrahman153`; Stage 5 onward on **`habiburrahman118`**.
+- **Kaggle accounts** (2026-11-05, updated): stages 1–4 and **Stage 9** on `habiburrahman153`; Stage 5–8 on **`habiburrahman118`**. The `habiburrahman118` quota ran out, so the API token in `~/.kaggle/access_token` was switched to `habiburrahman153` (30 h GPU, 20 h TPU, refreshes 2026-11-07T00:00:00). The old token is backed up at `~/.kaggle/access_token.habiburrahman118`. Private datasets cannot be attached across accounts, so the Stage 9 input dataset was re-uploaded as `habiburrahman153/bn-full-eval-validation`.
 - Arm A (whole pool, 91,120 rows): **full run** (2026-10-30). The user said to run the next stage and did not choose explicitly, so Claude took the standing recommendation; the user can still overrule it. A compute-matched run (2,500 steps on the whole pool) is just another random 10K rows, i.e. arm B, so it cannot answer "how close to the whole pool". 102.4M tokens at ~12 min/M = ~20.6 h, so 2 sessions at an 11 h budget.
 - Free GPU during arm A: extra seeds for D, E, F (43, 44), so all arms end with 3 seeds; quota counts session time, so these cost nothing extra.
 - `habiburrahman118` GPU quota: **reset to 30 h available**, confirmed by the user 2026-10-31 before S04. S04 uses an 11 h time budget; earlier estimates of ~6.4 h remaining are obsolete.
@@ -82,7 +89,7 @@ CPU kernels (Stage 4) do not use GPU quota and can still run there. **All GPU wo
 
 ## Conventions
 
-- Accounts: `habiburrahman153` (stages 1–4, GPU quota used up 2026-10-30) and `habiburrahman118` (Stage 5+). Kernel ids in
+- Accounts: `habiburrahman153` (stages 1–4, **and Stage 9**; GPU quota used up 2026-10-30, refreshed 2026-11-05) and `habiburrahman118` (Stages 5–8). Kernel ids in
   `kernel-metadata.json` carry the account name; a kernel can only attach outputs of the same account (or public ones / datasets).
 - Each stage lives in `kaggle/full_run/sNN_<name>/` (script + `kernel-metadata.json`) and is pushed with
   `kaggle kernels push -p <dir>`. Run the kaggle CLI with `PYTHONUTF8=1`, because Bengali logs break cp1252 on Windows.

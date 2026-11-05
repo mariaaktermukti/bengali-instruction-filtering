@@ -271,10 +271,68 @@ def step5_domain_and_filter_bias():
     df_dom_bias.to_csv(RESULTS_DIR / "domain_filter_bias.csv", index=False)
     print("Domain filter bias analysis saved.")
 
+
+def step6_judge_validation():
+    """Fold the Stage 9 judge validation into one table for the paper.
+
+    Two results matter:
+      * judge vs human on the 100 annotated rows (complexity and quality separately),
+      * the blind spot-check, where the independent rater is the non-circular number.
+    Both are produced by analysis/validate_llm_judge.py and analysis/join_spotcheck.py;
+    this step only merges them into a single summary table.
+    """
+    print("Generating judge validation summary...")
+    val_file = RESULTS_DIR / "judge_human_validation_summary.json"
+    spot_file = RESULTS_DIR / "spotcheck_summary.json"
+    if not (val_file.exists() and spot_file.exists()):
+        print("  (skipped: run analysis/validate_llm_judge.py and analysis/join_spotcheck.py first)")
+        return
+
+    val = json.loads(val_file.read_text(encoding="utf-8"))
+    spot = json.loads(spot_file.read_text(encoding="utf-8"))
+    rows = []
+
+    for metric, label in (("complexity", "Judge complexity vs human complexity"),
+                          ("quality", "Judge quality vs human quality")):
+        r = val["results"][metric]
+        rows.append({
+            "check": label,
+            "n": r["n"],
+            "spearman": r["spearman"],
+            "p_value": r["spearman_p"],
+            "exact_agreement": r["exact_agreement"],
+            "within_1": r["within_1"],
+            "kappa_quadratic": r["kappa_quadratic"],
+            "mae": r["mae_human_scale"],
+            "delta": "-",
+            "ci95": "-",
+        })
+
+    ind = spot.get("independent_rater") or {}
+    if ind:
+        rows.append({
+            "check": "Spot-check: arm C vs arm B (independent rater)",
+            "n": ind["n_C"] + ind["n_B"],
+            "spearman": "-",
+            "p_value": "-",
+            "exact_agreement": "-",
+            "within_1": "-",
+            "kappa_quadratic": "-",
+            "mae": "-",
+            "delta": ind["diff_C_minus_B"],
+            "ci95": f"[{ind['diff_ci95_low']}, {ind['diff_ci95_high']}]",
+        })
+
+    df_val = pd.DataFrame(rows)
+    df_val.to_csv(RESULTS_DIR / "judge_validation_summary.csv", index=False)
+    print("Judge validation summary saved.")
+
+
 if __name__ == "__main__":
     step1_qualitative_samples()
     step2_master_results_table()
     step3_token_efficiency()
     step4_diversity_ablation()
     step5_domain_and_filter_bias()
+    step6_judge_validation()
     print("\nALL PHASE 4 & PHASE 5 ANALYSES SUCCESSFULLY GENERATED!")

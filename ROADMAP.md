@@ -11,16 +11,16 @@ to training on the whole clean pool?
 
 | Phase | Done | Total |
 | --- | --- | --- |
-| 0. Pilot (1K rows) | 4 | 5 |
+| 0. Pilot (1K rows) | 5 | 5 |
 | 1. Full-run data pipeline | 5 | 5 |
-| 2. Arm selection | 4 | 5 |
+| 2. Arm selection | 5 | 5 |
 | 3. Training | 6 | 6 |
 | 4. Evaluation | 6 | 6 |
 | 5. Analysis | 5 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **30** | **40** |
+| **All** | **32** | **40** |
 
-Status as of 2026-11-05: **All experimental stages (1–8) and Phase 5 Analyses COMPLETE**.
+Status as of 2026-11-05: **All experimental stages (1–9) and Phase 5 Analyses COMPLETE**.
 - **Phase 4 Evaluation is 100% complete (6/6)**: Held-out loss, bootstrap comparisons, Bengali MMLU, BanglaRQA, pairwise judging (19,740 comparisons), and qualitative generation samples (`results/full_run/qualitative_samples.md`).
 - **Phase 5 Analysis is 100% complete (5/5)**:
   - Master results synthesis table (`results/full_run/main_results_table.csv`, `.md`).
@@ -37,7 +37,7 @@ Status as of 2026-11-05: **All experimental stages (1–8) and Phase 5 Analyses 
 - [x] LoRA arms A, B, C, D, F on the pilot (Qwen2.5-0.5B-Instruct), held-out eval + paired bootstrap ([KAGGLE_EXPERIMENTS.md](KAGGLE_EXPERIMENTS.md)). Finding: no 400-row rule beats random; IFD is worse
 - [x] Judge backend benchmark (Stage 3a): vLLM fp16 TP2, Spearman 1.000 vs the pilot (2026-10-27)
 - [x] Judge EN vs BN rubric agreement on the pilot (notebook cell 23)
-- [ ] Judge vs **human** labels (100 rows: `scripts/annotate_human.py`, `analysis/validate_llm_judge.py`). Labels are now at `human_annotation_100.jsonl`, but only 29 of the 100 rows are in the full-run pool, so the judge must score these rows (HANDOFF.md). A reviewer will ask for this
+- [x] Judge vs **human** labels (100 rows: `scripts/annotate_human.py`, `analysis/validate_llm_judge.py`). Done in Stage 9 (2026-11-05): the 71 rows outside the pool were scored fresh with the identical Stage 3 rubric and merged with the 29 production scores. **Complexity Spearman .543** (p<.0001, 95% within-1), **quality Spearman .078** (p=.44) - the judge's quality score is not validated against humans, and an independent Llama-3.1-8B rater fails the same way (rho −.084), so it is a rubric/model gap, not one bad model. Results in `results/full_run/judge_human_validation.md`
 
 ## 1. Full-run data pipeline (100K pool)
 
@@ -53,7 +53,7 @@ Status as of 2026-11-05: **All experimental stages (1–8) and Phase 5 Analyses 
 - [x] Diagnostics: C∩E = 91.5% at τ 0.90 (diversity step barely acts); code share 11.4% → 1.6% in C/E; token totals differ (B 12.2M, C 15.3M)
 - [x] τ recalibration: sweep 0.65–0.96, chose **τ 0.74** (≈ pool NN-sim p25; C∩E 58%, C has the lowest pair-sim .379 and code share 3.0% vs E 1.4%); arms rebuilt (Stage 4 v3) (2026-10-30)
 - [x] Stage 4 v4: arm F rebuilt with the Qwen IFD (code share 21.2%, 10.9M tokens); A–E unchanged (2026-10-30)
-- [ ] Blind spot-check: rate `reports/spotcheck_blind.csv` (50 C + 50 B rows, arm hidden), then join with `spotcheck_key.csv`
+- [x] Blind spot-check: `reports/spotcheck_blind.csv` (50 C + 50 B rows, arm hidden) rated by an **independent** model (Llama-3.1-8B-Instruct, different family from the Qwen judge that selected the arms, so the comparison is not circular), then joined with `spotcheck_key.csv`. **C beats B by +0.070** (95% CI [+0.009, +0.133], p=0.990) on 1-5 usefulness; the circular Qwen judge would have shown a much larger gap (c x q 23.25 vs 17.61). Results in `results/full_run/spotcheck_results.md` (2026-11-05)
 
 ## 3. Training (Stage 5, 2×T4, two arms per session)
 
@@ -100,7 +100,7 @@ Status as of 2026-11-05: **All experimental stages (1–8) and Phase 5 Analyses 
 | Judge backend | **vLLM fp16 TP2** (2026-10-27) |
 | τ | **0.74** (2026-10-30) |
 | Base model for LoRA | **Qwen2.5-0.5B-Instruct** (2026-10-30) |
-| Kaggle account | stages 1–4: habiburrahman153; Stage 5+: **habiburrahman118** |
+| Kaggle account | stages 1–4 and **Stage 9**: habiburrahman153; stages 5–8: **habiburrahman118** |
 | Arm A: full or compute-matched | **full** (2026-10-30; Claude took the standing recommendation, user can overrule) |
 | Downstream benchmarks | **Bengali MMLU & BanglaRQA completed** (2026-11-02) |
 | Pairwise judge (Stage 8) | **DECIDED 2026-11-02: Qwen2.5-7B-Instruct fp16 vLLM TP=2** (S01 8,500/19,740 done, S02 ready) |

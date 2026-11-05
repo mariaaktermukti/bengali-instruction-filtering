@@ -1,0 +1,93 @@
+{
+  "results": {
+    "complexity": {
+      "n": 100,
+      "spearman": 0.5426,
+      "spearman_p": 0.0,
+      "pearson": 0.5373,
+      "pearson_p": 0.0,
+      "kendall_tau": 0.4298,
+      "kendall_p": 0.0,
+      "mae_raw_scale": 1.0211,
+      "mae_human_scale": 0.717,
+      "exact_agreement": 0.4,
+      "within_1": 0.95,
+      "kappa_quadratic": 0.3162,
+      "kappa_linear": 0.1783,
+      "kappa_unweighted": 0.0661,
+      "human_mean": 2.06,
+      "judge_mean_raw": 3.0373,
+      "judge_mean_human_scale": 2.6298
+    },
+    "quality": {
+      "n": 100,
+      "spearman": 0.0779,
+      "spearman_p": 0.4413,
+      "pearson": 0.1384,
+      "pearson_p": 0.1698,
+      "kendall_tau": 0.0385,
+      "kendall_p": 0.6613,
+      "mae_raw_scale": 2.0095,
+      "mae_human_scale": 1.5621,
+      "exact_agreement": 0.14,
+      "within_1": 0.54,
+      "kappa_quadratic": 0.0329,
+      "kappa_linear": -0.0374,
+      "kappa_unweighted": -0.0871,
+      "human_mean": 3.15,
+      "judge_mean_raw": 5.1106,
+      "judge_mean_human_scale": 4.2885
+    }
+  },
+  "calibration": {
+    "complexity": {
+      "1": {
+        "n": 22,
+        "judge_mean_human_scale": 2.202,
+        "judge_sd": 0.405
+      },
+      "2": {
+        "n": 51,
+        "judge_mean_human_scale": 2.566,
+        "judge_sd": 0.557
+      },
+      "3": {
+        "n": 26,
+        "judge_mean_human_scale": 3.089,
+        "judge_sd": 0.483
+      },
+      "4": {
+        "n": 1,
+        "judge_mean_human_scale": 3.384,
+        "judge_sd": 0.0
+      }
+    },
+    "quality": {
+      "1": {
+        "n": 16,
+        "judge_mean_human_scale": 4.021,
+        "judge_sd": 0.5
+      },
+      "2": {
+        "n": 25,
+        "judge_mean_human_scale": 4.272,
+        "judge_sd": 0.548
+      },
+      "3": {
+        "n": 13,
+        "judge_mean_human_scale": 4.438,
+        "judge_sd": 0.621
+      },
+      "4": {
+        "n": 20,
+        "judge_mean_human_scale": 4.54,
+        "judge_sd": 0.303
+      },
+      "5": {
+        "n": 26,
+        "judge_mean_human_scale": 4.201,
+        "judge_sd": 0.268
+      }
+    }
+  }
+}
