@@ -1,0 +1,15 @@
+{
+  "human_rows_total": 100,
+  "human_rows_scored": 100,
+  "human_rows_from_stage3_pool": 29,
+  "human_rows_fresh": 71,
+  "human_rows_with_llama": 100,
+  "spotcheck_rows_scored": 100,
+  "spotcheck_rows_with_llama": 100,
+  "judge_model": "Qwen/Qwen2.5-7B-Instruct",
+  "independent_rater": "unsloth/Llama-3.1-8B-Instruct",
+  "vllm_version": "0.32.0",
+  "parse_rate_fresh": 0.71,
+  "total_minutes": 20.9,
+  "complete": true
+}

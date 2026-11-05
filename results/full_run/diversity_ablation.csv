@@ -1,0 +1,12 @@
+metric,Arm_C (with diversity),Arm_E (no diversity),Delta (C - E)
+Selection Diversity Threshold (tau),0.74,inf (none),-
+Overlap with Arm E (rows),58.1%,100%,-41.9%
+Mean Pairwise Embedding Similarity,0.3788,0.3909,-0.0121
+Distinct-2 Response Tokens,0.5033,0.4509,0.0524
+Embedding Space Coverage,0.7459,0.7273,0.0186
+Code Domain Representation,3.0%,1.4%,+1.6%
+Held-out Per-example Loss (lower better),0.838,0.8661,-0.0281
+Token-weighted Loss (lower better),0.8186,0.8255,-0.0069
+Bengali MMLU Accuracy (higher better),0.2505,0.237,0.0135
+BanglaRQA F1 (higher better),0.1757,0.1681,0.0076
+Head-to-Head Pairwise Win Rate,0.6170,0.3830,+0.2340

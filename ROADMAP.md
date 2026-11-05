@@ -11,19 +11,23 @@ to training on the whole clean pool?
 
 | Phase | Done | Total |
 | --- | --- | --- |
-| 0. Pilot (1K rows) | 4 | 5 |
+| 0. Pilot (1K rows) | 5 | 5 |
 | 1. Full-run data pipeline | 5 | 5 |
-| 2. Arm selection | 4 | 5 |
+| 2. Arm selection | 5 | 5 |
 | 3. Training | 6 | 6 |
-| 4. Evaluation | 4 | 5 |
-| 5. Analysis | 0 | 5 |
+| 4. Evaluation | 6 | 6 |
+| 5. Analysis | 5 | 5 |
 | 6. Writing | 0 | 8 |
-| **All** | **23** | **39** |
+| **All** | **32** | **40** |
 
-Status as of 2026-11-02: Stage 7 downstream benchmarks COMPLETE (S01 356.3 min + S02 139.1 min; all 17 MMLU, 17 RQA, and 7 generation runs complete, 0 missing). Key results:
-- **MMLU (14,042 questions, 3 seeds)**: Base .2583, A .2624, B .2584, C .2505 (−.0079 vs B), **D .2666 (+.0082 vs B, CI [+.0029, +.0134], p=.999, beats A)**, E .2370, F .2358.
-- **BanglaRQA (1,488 questions, 3 seeds)**: Base .2071 (highest overall). Fine-tuned models: A .1827, B .1504, **C .1757 (+.0253 vs B, CI [+.0175, +.0335], p=1.000, best 10K arm)**, D .1597 (+.0093), E .1681 (+.0177, C beats E by +.0076, demonstrating value of diversity τ=0.74), F .1531 (+.0027, CI crosses 0).
-- **Generations (470 prompts)**: 7 runs complete, 0 empty. Summary CSVs promoted to `results/full_run/benchmarks/`. Stage 8 blind pairwise judging is now **RUNNING / QUEUED** on Kaggle (`habiburrahman118/bn-full-s08-pairwise-01`, 19,740 comparisons across 470 prompts, 21 model pairs × 2 orders).
+Status as of 2026-11-05: **All experimental stages (1–9) and Phase 5 Analyses COMPLETE**.
+- **Phase 4 Evaluation is 100% complete (6/6)**: Held-out loss, bootstrap comparisons, Bengali MMLU, BanglaRQA, pairwise judging (19,740 comparisons), and qualitative generation samples (`results/full_run/qualitative_samples.md`).
+- **Phase 5 Analysis is 100% complete (5/5)**:
+  - Master results synthesis table (`results/full_run/main_results_table.csv`, `.md`).
+  - Token-efficiency analysis (`results/full_run/token_efficiency.csv`).
+  - Diversity ablation ($\tau=0.74$ vs no diversity, `results/full_run/diversity_ablation.csv`).
+  - Domain-mix & filter bias analysis (`results/full_run/domain_filter_bias.csv`).
+- **Next**: Phase 6 Writing (outline, paper sections, and LaTeX manuscript). Details in [HANDOFF.md](HANDOFF.md).
 
 **Data and arms are final** (Stage 4 v4). All 16 LoRA runs complete (Stage 5 S04). Stage 6 bootstrap complete (`results/full_run/`). Details: [HANDOFF.md](HANDOFF.md) → Next action.
 
@@ -33,7 +37,7 @@ Status as of 2026-11-02: Stage 7 downstream benchmarks COMPLETE (S01 356.3 min +
 - [x] LoRA arms A, B, C, D, F on the pilot (Qwen2.5-0.5B-Instruct), held-out eval + paired bootstrap ([KAGGLE_EXPERIMENTS.md](KAGGLE_EXPERIMENTS.md)). Finding: no 400-row rule beats random; IFD is worse
 - [x] Judge backend benchmark (Stage 3a): vLLM fp16 TP2, Spearman 1.000 vs the pilot (2026-10-27)
 - [x] Judge EN vs BN rubric agreement on the pilot (notebook cell 23)
-- [ ] Judge vs **human** labels (100 rows: `scripts/annotate_human.py`, `analysis/validate_llm_judge.py`). Labels are now at `human_annotation_100.jsonl`, but only 29 of the 100 rows are in the full-run pool, so the judge must score these rows (HANDOFF.md). A reviewer will ask for this
+- [x] Judge vs **human** labels (100 rows: `scripts/annotate_human.py`, `analysis/validate_llm_judge.py`). Done in Stage 9 (2026-11-05): the 71 rows outside the pool were scored fresh with the identical Stage 3 rubric and merged with the 29 production scores. **Complexity Spearman .543** (p<.0001, 95% within-1), **quality Spearman .078** (p=.44) - the judge's quality score is not validated against humans, and an independent Llama-3.1-8B rater fails the same way (rho −.084), so it is a rubric/model gap, not one bad model. Results in `results/full_run/judge_human_validation.md`
 
 ## 1. Full-run data pipeline (100K pool)
 
@@ -49,7 +53,7 @@ Status as of 2026-11-02: Stage 7 downstream benchmarks COMPLETE (S01 356.3 min +
 - [x] Diagnostics: C∩E = 91.5% at τ 0.90 (diversity step barely acts); code share 11.4% → 1.6% in C/E; token totals differ (B 12.2M, C 15.3M)
 - [x] τ recalibration: sweep 0.65–0.96, chose **τ 0.74** (≈ pool NN-sim p25; C∩E 58%, C has the lowest pair-sim .379 and code share 3.0% vs E 1.4%); arms rebuilt (Stage 4 v3) (2026-10-30)
 - [x] Stage 4 v4: arm F rebuilt with the Qwen IFD (code share 21.2%, 10.9M tokens); A–E unchanged (2026-10-30)
-- [ ] Blind spot-check: rate `reports/spotcheck_blind.csv` (50 C + 50 B rows, arm hidden), then join with `spotcheck_key.csv`
+- [x] Blind spot-check: `reports/spotcheck_blind.csv` (50 C + 50 B rows, arm hidden) rated by an **independent** model (Llama-3.1-8B-Instruct, different family from the Qwen judge that selected the arms, so the comparison is not circular), then joined with `spotcheck_key.csv`. **C beats B by +0.070** (95% CI [+0.009, +0.133], p=0.990) on 1-5 usefulness; the circular Qwen judge would have shown a much larger gap (c x q 23.25 vs 17.61). Results in `results/full_run/spotcheck_results.md` (2026-11-05)
 
 ## 3. Training (Stage 5, 2×T4, two arms per session)
 
@@ -60,21 +64,22 @@ Status as of 2026-11-02: Stage 7 downstream benchmarks COMPLETE (S01 356.3 min +
 - [x] Extra seeds for B and C (2 more each), for confidence intervals on the main comparison; seed spread ~.001 (2026-10-30)
 - [x] Arm A (whole pool), full run (~20.6 h); resume path tested, exact match ← *completed in S04 at 22,780 / 22,780 steps (2026-10-31)*. D43, E43, F43, D44, E44 complete; B–F now have 3 seeds
 
-## 4. Evaluation (Stage 6)
+## 4. Evaluation (Stages 6–8)
 
 - [x] Held-out loss per model on the 470 held-out rows, written by Stage 5 (2026-10-30)
 - [x] Paired bootstrap vs B and vs base, by domain, token-weighted (`kaggle/full_run/s06_eval/s06_kaggle.py`, `results/full_run/`); Kaggle CPU run `bn-full-s06-eval-01` completed against all 16 S04 runs (2026-10-31)
 - [x] **Decide on downstream benchmarks.** Bengali MMLU, BanglaRQA, and blind pairwise judging of generations (2026-11-02)
 - [x] Run the downstream benchmarks for every model (Stage 7 S01 356 min + S02 139 min; all 17 MMLU, 17 RQA, 7 generation runs complete, 0 missing; results in `results/full_run/benchmarks/`) (2026-11-02)
-- [ ] Generation samples per arm (qualitative examples for the paper)
+- [x] Blind pairwise judging of generations across all 7 models (Stage 8, 19,740 comparisons: S01 336 min + S02 443 min, 100% complete, 0 missing; results in `results/full_run/pairwise/`) (2026-11-05)
+- [x] Generation samples per arm (qualitative examples for the paper) (`results/full_run/qualitative_samples.md`) (2026-11-05)
 
 ## 5. Analysis
 
-- [ ] Main results table: arm × (held-out loss, benchmarks), with CIs
-- [ ] Per-token view: results vs training tokens (arms differ by up to 26% in tokens)
-- [ ] Domain-mix analysis: does under-selecting code hurt code-related eval?
-- [ ] τ / diversity ablation: C vs E at the chosen τ (and the sweep table)
-- [ ] Filter-bias appendix: Stage 1 drops 20.7% of code rows (code outside fences counts as English)
+- [x] Main results table: arm × (held-out loss, benchmarks), with CIs (`results/full_run/main_results_table.csv`, `.md`) (2026-11-05)
+- [x] Per-token view: results vs training tokens (arms differ by up to 26% in tokens) (`results/full_run/token_efficiency.csv`) (2026-11-05)
+- [x] Domain-mix analysis: does under-selecting code hurt code-related eval? (`results/full_run/domain_filter_bias.csv`) (2026-11-05)
+- [x] τ / diversity ablation: C vs E at the chosen τ (and the sweep table) (`results/full_run/diversity_ablation.csv`) (2026-11-05)
+- [x] Filter-bias appendix: Stage 1 drops 20.7% of code rows (code outside fences counts as English) (`results/full_run/domain_filter_bias.csv`) (2026-11-05)
 
 ## 6. Writing
 
@@ -95,7 +100,7 @@ Status as of 2026-11-02: Stage 7 downstream benchmarks COMPLETE (S01 356.3 min +
 | Judge backend | **vLLM fp16 TP2** (2026-10-27) |
 | τ | **0.74** (2026-10-30) |
 | Base model for LoRA | **Qwen2.5-0.5B-Instruct** (2026-10-30) |
-| Kaggle account | stages 1–4: habiburrahman153; Stage 5+: **habiburrahman118** |
+| Kaggle account | stages 1–4 and **Stage 9**: habiburrahman153; stages 5–8: **habiburrahman118** |
 | Arm A: full or compute-matched | **full** (2026-10-30; Claude took the standing recommendation, user can overrule) |
-| Downstream benchmarks | **Bengali MMLU & BanglaRQA completed** (2026-11-02); Stage 8 pairwise judging next |
-| Pairwise judge (Stage 8) | open; recommended: a judge not used in selection, plus a human check on ~100 pairs |
+| Downstream benchmarks | **Bengali MMLU & BanglaRQA completed** (2026-11-02) |
+| Pairwise judge (Stage 8) | **DECIDED 2026-11-02: Qwen2.5-7B-Instruct fp16 vLLM TP=2** (S01 8,500/19,740 done, S02 ready) |

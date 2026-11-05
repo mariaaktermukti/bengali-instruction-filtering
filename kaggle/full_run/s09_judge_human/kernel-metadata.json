@@ -1,0 +1,19 @@
+{
+  "id": "habiburrahman153/bn-full-s09-judge-human-02",
+  "title": "bn-full-s09-judge-human-02",
+  "code_file": "s09_judge_human.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": [
+    "habiburrahman153/bn-full-eval-validation"
+  ],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": [],
+  "keywords": []
+}

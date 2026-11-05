@@ -1,0 +1,4 @@
+check,n,spearman,p_value,exact_agreement,within_1,kappa_quadratic,mae,delta,ci95
+Judge complexity vs human complexity,100,0.5426,0.0,0.4,0.95,0.3162,0.717,-,-
+Judge quality vs human quality,100,0.0779,0.4413,0.14,0.54,0.0329,1.5621,-,-
+Spot-check: arm C vs arm B (independent rater),100,-,-,-,-,-,-,0.0695,"[0.0093, 0.133]"

@@ -1,0 +1,64 @@
+{
+  "summary": [
+    {
+      "arm": "B",
+      "n_items": 50,
+      "n_human_rated": 0,
+      "human_mean_rating": NaN,
+      "human_rating_ci95_low": NaN,
+      "human_rating_ci95_high": NaN,
+      "independent_mean_rating": 4.0547,
+      "independent_ci95_low": 4.0047,
+      "independent_ci95_high": 4.1011,
+      "judge_mean_complexity": 3.6257,
+      "judge_mean_quality": 4.8847,
+      "judge_mean_cq": 17.6045
+    },
+    {
+      "arm": "C",
+      "n_items": 50,
+      "n_human_rated": 0,
+      "human_mean_rating": NaN,
+      "human_rating_ci95_low": NaN,
+      "human_rating_ci95_high": NaN,
+      "independent_mean_rating": 4.1243,
+      "independent_ci95_low": 4.0875,
+      "independent_ci95_high": 4.1642,
+      "judge_mean_complexity": 4.5096,
+      "judge_mean_quality": 5.1777,
+      "judge_mean_cq": 23.2503
+    }
+  ],
+  "human_vs_arm": {
+    "has_ratings": false
+  },
+  "independent_rater": {
+    "rater": "unsloth/Llama-3.1-8B-Instruct",
+    "n_C": 50,
+    "n_B": 50,
+    "mean_C": 4.1243,
+    "mean_B": 4.0547,
+    "diff_C_minus_B": 0.0695,
+    "diff_ci95_low": 0.0093,
+    "diff_ci95_high": 0.133,
+    "p_C_better": 0.9898
+  },
+  "judge_by_arm": {
+    "B": {
+      "n": 50,
+      "mean_complexity": 3.6257,
+      "mean_quality": 4.8847,
+      "mean_cq": 17.6045,
+      "cq_ci95_low": 16.3227,
+      "cq_ci95_high": 18.8344
+    },
+    "C": {
+      "n": 50,
+      "mean_complexity": 4.5096,
+      "mean_quality": 5.1777,
+      "mean_cq": 23.2503,
+      "cq_ci95_low": 22.8731,
+      "cq_ci95_high": 23.6173
+    }
+  }
+}
